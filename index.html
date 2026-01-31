@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cypher | Decode the Unseen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cypherBlue: '#007AFF',
+                        cypherPurple: '#5856D6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-[#F2F2F7] text-[#1C1C1E] dark:bg-[#000000] dark:text-[#F2F2F7] min-h-screen font-sans antialiased transition-colors duration-500">
+
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cypherBlue opacity-10 blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cypherPurple opacity-10 blur-[120px]"></div>
+    </div>
+
+    <nav class="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto w-full">
+        <div class="flex items-center space-x-3 group cursor-pointer">
+            <div class="w-9 h-9 rounded-full border-[1.5px] border-black/20 dark:border-white/20 flex items-center justify-center font-semibold text-lg transition-all group-hover:border-cypherBlue">
+                ツ
+            </div>
+            <span class="text-lg font-semibold tracking-tight">Cypher</span>
+        </div>
+        <div class="flex items-center space-x-6 text-sm font-medium opacity-50 hover:opacity-100 transition">
+            <a href="#" class="hover:text-cypherBlue transition">Lab</a>
+            <a href="#" class="hover:text-cypherBlue transition">Methods</a>
+            <button class="bg-black text-white dark:bg-white dark:text-black px-4 py-1.5 rounded-full text-xs">Sign In</button>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 pt-16 pb-24">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-7xl font-semibold tracking-tight mb-6">
+                Cryptanalysis <span class="text-cypherBlue">Simplified.</span>
+            </h1>
+            <p class="text-lg opacity-50 max-w-xl mx-auto leading-relaxed">
+                Enter the sandbox. Paste encrypted strings and watch Cyphe ツ break them down in real-time.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[450px]">
+            
+            <div class="glass rounded-3xl p-8 flex flex-col relative overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs uppercase tracking-widest opacity-40 font-mono">Encrypted Input</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-md bg-cypherBlue/10 text-cypherBlue font-mono uppercase">Waiting</span>
+                </div>
+                <textarea 
+                    id="inputArea"
+                    class="bg-transparent border-none focus:ring-0 w-full h-full p-4 text-xl md:text-2xl font-mono placeholder:opacity-20 resize-none"
+                    placeholder="Waiting for text..."
+                ></textarea>
+            </div>
+
+            <div class="glass rounded-3xl p-8 flex flex-col relative border-cypherBlue/20">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs uppercase tracking-widest opacity-40 font-mono">Decrypted Result</span>
+                    <div id="statusIcon" class="text-lg">ツ</div>
+                </div>
+                <div id="outputArea" class="text-xl md:text-2xl font-mono text-cypherBlue break-all leading-relaxed">¯\_(ツ)_/¯
+                    </div>
+                
+                <div class="mt-auto pt-6 border-t border-white/5 text-xs opacity-40 leading-relaxed font-mono">
+                    <span class="text-cypherPurple">LOG:</span> <span id="logText">Cyphe is standing by. Try shifting characters.</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="main.js"></script>
+</body>
+</html>

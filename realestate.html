@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noida Lux | Premium Real Estate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-gradient {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1600');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <nav class="fixed w-full z-50 px-6 py-4 flex justify-between items-center glass shadow-sm">
+        <div class="text-2xl font-bold tracking-tighter serif text-slate-800">NOIDA<span class="text-emerald-700">LUX</span></div>
+        <div class="hidden md:flex space-x-8 font-medium text-sm uppercase tracking-widest text-slate-600">
+            <a href="#" class="hover:text-emerald-700 transition">Buy</a>
+            <a href="#" class="hover:text-emerald-700 transition">Sell</a>
+            <a href="#" class="hover:text-emerald-700 transition">New Projects</a>
+            <a href="#" class="hover:text-emerald-700 transition">Investment Guide</a>
+        </div>
+        <button class="bg-slate-900 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-emerald-800 transition">Contact Expert</button>
+    </nav>
+
+    <section class="h-screen flex items-center justify-center text-center px-4 hero-gradient">
+        <div class="max-w-4xl">
+            <h1 class="text-5xl md:text-7xl text-white serif mb-6">Invest in the Future of NCR</h1>
+            <p class="text-xl text-slate-200 mb-10 font-light">Curated luxury properties in Noida’s most exclusive sectors.</p>
+            
+            <div class="glass p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row gap-2 shadow-2xl">
+                <input type="text" placeholder="Sector, Project or Landmark..." class="flex-grow px-6 py-4 rounded-full bg-transparent focus:outline-none text-slate-800">
+                <select class="px-6 py-4 bg-transparent border-l border-slate-200 focus:outline-none font-semibold text-slate-700">
+                    <option>Property Type</option>
+                    <option>Luxury Flat</option>
+                    <option>Penthouse</option>
+                    <option>Plot</option>
+                </select>
+                <button class="bg-emerald-700 text-white px-10 py-4 rounded-full font-bold hover:bg-emerald-800 transition shadow-lg">SEARCH</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="flex justify-between items-end mb-12">
+            <div>
+                <h2 class="text-3xl serif mb-2">Market Hotspots</h2>
+                <p class="text-slate-500">Highest ROI sectors in Noida for 2026</p>
+            </div>
+            <a href="#" class="text-emerald-700 font-bold border-b-2 border-emerald-700 pb-1">View Market Report</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl h-80 mb-4">
+                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800" class="object-cover w-full h-full transition duration-500 group-hover:scale-110">
+                    <div class="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded text-xs font-bold uppercase tracking-tighter">Sector 150</div>
+                </div>
+                <h3 class="text-xl font-bold mb-1">The Green Corridor</h3>
+                <p class="text-slate-500 text-sm">Avg. ₹12,500/sq.ft • High Appreciation</p>
+            </div>
+
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl h-80 mb-4">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" class="object-cover w-full h-full transition duration-500 group-hover:scale-110">
+                    <div class="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded text-xs font-bold uppercase tracking-tighter">Expressway</div>
+                </div>
+                <h3 class="text-xl font-bold mb-1">Corporate Hub Residences</h3>
+                <p class="text-slate-500 text-sm">Near Advant It Park • Ready to Move</p>
+            </div>
+
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-2xl h-80 mb-4">
+                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800" class="object-cover w-full h-full transition duration-500 group-hover:scale-110">
+                    <div class="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded text-xs font-bold uppercase tracking-tighter">Extension</div>
+                </div>
+                <h3 class="text-xl font-bold mb-1">The Central Park Luxury</h3>
+                <p class="text-slate-500 text-sm">Premium 3/4 BHKs • RERA Approved</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-white py-16 px-6 text-center">
+        <h2 class="text-3xl serif mb-6">Ready to find your Noida home?</h2>
+        <p class="text-slate-400 mb-8 max-w-xl mx-auto">Get exclusive early-access to pre-launch projects near the upcoming Jewar International Airport.</p>
+        <div class="flex flex-col md:flex-row justify-center gap-4">
+            <button class="bg-emerald-700 px-8 py-3 rounded-full font-bold hover:bg-emerald-600 transition">Request Callback</button>
+            <button class="border border-slate-700 px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition">Download Price List</button>
+        </div>
+        <div class="mt-16 pt-8 border-t border-slate-800 text-slate-500 text-sm">
+            © 2026 Noida Lux Real Estate. All rights reserved. RERA: UPRERAPRJ12345
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "cypher",
+  "version": "1.0.0",
+  "description": "A website that shows and explains the methods of cryptology and cryptanalysis.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HC-29/cypher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HC-29/cypher/issues"
+  },
+  "homepage": "https://github.com/HC-29/cypher#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
+  }
+}
