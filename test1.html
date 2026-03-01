@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cypher | Decode the Unseen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Changed to class for easier manual toggling if needed
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cypherBlue: '#007AFF',
+                        cypherPurple: '#5856D6',
+                        cypherPink: '#FF2D55',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-subtle': 'bounce-subtle 2s infinite',
+                    },
+                    keyframes: {
+                        'bounce-subtle': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 122, 255, 0.2); border-radius: 10px; }
+        
+        /* Easter Egg: Glitch Effect */
+        .glitch-mode { animation: glitch 0.2s infinite; }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body class="bg-[#F2F2F7] text-[#1C1C1E] dark:bg-[#000000] dark:text-[#F2F2F7] min-h-screen font-sans antialiased transition-colors duration-700">
+
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cypherBlue opacity-10 blur-[120px] animate-pulse-slow"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cypherPurple opacity-10 blur-[120px] animate-pulse-slow"></div>
+    </div>
+
+    <nav class="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto w-full">
+        <div class="flex items-center space-x-3 group cursor-pointer" onclick="eggTrigger()">
+            <div id="navMascot" class="w-10 h-10 rounded-full border-[1.5px] border-black/10 dark:border-white/10 flex items-center justify-center font-semibold text-lg transition-all group-hover:scale-110 group-hover:border-cypherBlue">
+                ツ
+            </div>
+            <span class="text-lg font-semibold tracking-tight">Cypher Lab</span>
+        </div>
+        <div class="flex items-center space-x-6 text-sm font-medium">
+            <select id="methodSelect" class="bg-transparent border-none outline-none font-mono text-cypherBlue cursor-pointer opacity-70 hover:opacity-100 transition">
+                <option value="binary">Bits (Char to Bit)</option>
+                <option value="base64">Base64</option>
+                <option value="rot13">ROT13</option>
+                <option value="atbash">Atbash Cipher</option>
+                <option value="hex">Hexadecimal</option>
+                <option value="reverse">Reverse Text</option>
+            </select>
+            <button id="toggleMode" class="bg-black text-white dark:bg-white dark:text-black px-4 py-1.5 rounded-full text-xs hover:scale-105 transition-transform active:scale-95">Encode</button>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 pt-12 pb-24">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl md:text-6xl font-semibold tracking-tight mb-4">
+                Decode the <span id="heroSpan" class="text-cypherBlue transition-all">Unseen.</span>
+            </h1>
+            <p id="heroSub" class="text-lg opacity-40 max-w-xl mx-auto leading-relaxed">
+                Paste your strings and let <span class="font-mono text-cypherPurple italic">ツ</span> handle the math.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[400px]">
+            
+            <div class="glass rounded-[2rem] p-8 flex flex-col relative transition-all duration-500 hover:shadow-2xl hover:shadow-cypherBlue/5">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] uppercase tracking-[0.2em] opacity-30 font-mono">Original String</span>
+                    <button onclick="clearInput()" class="text-[10px] opacity-30 hover:opacity-100 font-mono uppercase">Clear</button>
+                </div>
+                <textarea 
+                    id="inputArea"
+                    class="bg-transparent border-none focus:ring-0 w-full h-full text-xl md:text-2xl font-mono placeholder:opacity-100 resize-none custom-scrollbar outline-none"
+                    placeholder="Type here..."
+                ></textarea>
+            </div>
+
+            <div id="outputPanel" class="glass rounded-[2rem] p-8 flex flex-col relative border-cypherBlue/10 transition-all duration-500">
+                <div class="flex justify-between items-center mb-4">
+                    <span id="outputLabel" class="text-[10px] uppercase tracking-[0.2em] opacity-30 font-mono">Result</span>
+                    <div id="statusIcon" class="text-xl animate-bounce-subtle cursor-help">ツ</div>
+                </div>
+                <div id="outputArea" class="text-xl md:text-2xl font-mono text-cypherBlue break-all leading-relaxed custom-scrollbar overflow-y-auto max-h-64">
+                    ¯\_(ツ)_/¯
+                </div>
+                
+                <div class="mt-auto pt-6 border-t border-white/5 text-[10px] opacity-30 leading-relaxed font-mono flex justify-between">
+                    <div><span class="text-cypherPurple">LOG:</span> <span id="logText">System idle. Ready to process.</span></div>
+                    <div id="charCount">0 chars</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+        const logText = document.getElementById('logText');
+        const statusIcon = document.getElementById('statusIcon');
+        const methodSelect = document.getElementById('methodSelect');
+        const toggleMode = document.getElementById('toggleMode');
+        const charCount = document.getElementById('charCount');
+        const heroSpan = document.getElementById('heroSpan');
+
+        let isEncoding = true;
+
+        // Toggle Encode/Decode
+        toggleMode.addEventListener('click', () => {
+            isEncoding = !isEncoding;
+            toggleMode.innerText = isEncoding ? 'Encode' : 'Decode';
+            toggleMode.classList.toggle('bg-cypherBlue');
+            toggleMode.classList.toggle('text-white');
+            process();
+        });
+
+        // Conversion Logic
+        const converters = {
+            binary: (str) => {
+                if (isEncoding) {
+                    return str.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+                } else {
+                    return str.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
+                }
+            },
+            base64: (str) => {
+                try {
+                    return isEncoding ? btoa(str) : atob(str);
+                } catch(e) { return "Invalid Base64 Data"; }
+            },
+            rot13: (str) => {
+                return str.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+            },
+            atbash: (str) => {
+                return str.replace(/[a-z]/gi, (c) => {
+                    const n = c.charCodeAt(0);
+                    const base = n >= 97 ? 97 : 65;
+                    return String.fromCharCode(base + 25 - (n - base));
+                });
+            },
+            hex: (str) => {
+                if (isEncoding) {
+                    return str.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
+                } else {
+                    return str.split(' ').map(h => String.fromCharCode(parseInt(h, 16))).join('');
+                }
+            },
+            reverse: (str) => str.split('').reverse().join('')
+        };
+
+        function process() {
+            const val = inputArea.value;
+            const method = methodSelect.value;
+            charCount.innerText = `${val.length} chars`;
+
+            if(val.length > 0) {
+                // Mascot reactions
+                if (val.includes('ツ')) statusIcon.innerText = 'ヾ(ツ)ノ';
+                else if (val.length > 20) statusIcon.innerText = '(⊙_⊙)';
+                else statusIcon.innerText = '(._.)';
+
+                logText.innerText = `Applying ${method} ${isEncoding ? 'encoding' : 'decoding'}...`;
+                
+                try {
+                    const result = converters[method](val);
+                    outputArea.innerText = result;
+                    outputArea.classList.remove('text-red-500');
+                } catch (e) {
+                    outputArea.innerText = "Error processing data.";
+                    outputArea.classList.add('text-red-500');
+                    statusIcon.innerText = '(×_×)';
+                }
+
+                // Easter Eggs triggered by words
+                if (val.toLowerCase() === 'glitch') {
+                    document.body.classList.add('glitch-mode');
+                    heroSpan.innerText = "Glitching.";
+                } else if (val.toLowerCase() === 'rainbow') {
+                    heroSpan.className = "bg-gradient-to-r from-red-500 via-green-500 to-blue-500 bg-clip-text text-transparent animate-pulse";
+                } else {
+                    document.body.classList.remove('glitch-mode');
+                    heroSpan.innerText = "Unseen.";
+                    heroSpan.className = "text-cypherBlue";
+                }
+
+            } else {
+                statusIcon.innerText = 'ツ';
+                outputArea.innerText = '¯\\_(ツ)_/¯';
+                logText.innerText = "System idle. Ready to process.";
+            }
+            const placeholders = {
+    binary: "Example: 01001000 01001001...",
+    base64: "Example: SGVsbG8gVHp1IQ==...",
+    rot13: "Enter text to shift (A becomes N)...",
+    atbash: "Enter text to flip (A becomes Z)...",
+    hex: "Example: 48 65 6c 6c 6f...",
+    reverse: "Type something to flip it backwards..."
+};
+
+// Update this inside your methodSelect event listener
+methodSelect.addEventListener('change', () => {
+    const method = methodSelect.value;
+    // If encoding, show a standard text prompt; if decoding, show a format example
+    inputArea.placeholder = isEncoding ? "Type the text you want to hide..." : placeholders[method];
+    process(); 
+});
+        }
+
+        inputArea.addEventListener('input', process);
+        methodSelect.addEventListener('change', process);
+
+        function clearInput() {
+            inputArea.value = '';
+            process();
+        }
+
+        function eggTrigger() {
+            const navMascot = document.getElementById('navMascot');
+            navMascot.innerText = '°ロ°';
+            setTimeout(() => navMascot.innerText = 'ツ', 1000);
+            console.log("Easter egg found! Keep exploring.");
+        }
+    </script>
+</body>
+</html>

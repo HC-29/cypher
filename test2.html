@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTools — Encode · Decode · Convert</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.52);
+            --glass-border: rgba(255, 255, 255, 0.75);
+            --glass-shadow: 0 8px 40px rgba(100, 110, 160, 0.13), 0 1.5px 0 rgba(255, 255, 255, 0.9) inset, 0 -1px 0 rgba(180, 190, 220, 0.18) inset;
+            --glass-hover: rgba(255, 255, 255, 0.72);
+            --blur: blur(22px) saturate(1.8);
+            --text: #1a1d2e;
+            --text-soft: #4a5070;
+            --text-muted: #8892b0;
+            --accent: #5b6ef5;
+            --accent-soft: rgba(91, 110, 245, 0.12);
+            --accent2: #a78bfa;
+            --accent3: #34d399;
+            --danger: #f87171;
+            --warn: #fbbf24;
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            background: #e8ecf8;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.55;
+            animation: blobFloat 18s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, #c7d2fe 0%, #e0e7ff 60%);
+            top: -200px;
+            left: -200px;
+            animation-duration: 22s;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #ddd6fe 0%, #ede9fe 60%);
+            top: 30%;
+            right: -150px;
+            animation-duration: 18s;
+            animation-delay: -6s;
+        }
+
+        .blob-3 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #a5f3fc 0%, #cffafe 60%);
+            bottom: -150px;
+            left: 30%;
+            animation-duration: 25s;
+            animation-delay: -12s;
+        }
+
+        .blob-4 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #fbcfe8 0%, #fce7f3 60%);
+            top: 50%;
+            left: 10%;
+            animation-duration: 20s;
+            animation-delay: -3s;
+        }
+
+        @keyframes blobFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -40px) scale(1.04);
+            }
+
+            66% {
+                transform: translate(-20px, 25px) scale(0.97);
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.022;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0 2rem;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: rgba(232, 236, 248, 0.7);
+            backdrop-filter: blur(30px) saturate(2);
+            -webkit-backdrop-filter: blur(30px) saturate(2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 1px 0 rgba(180, 190, 220, 0.2), 0 4px 24px rgba(100, 110, 180, 0.07);
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 1.15rem;
+            letter-spacing: -0.03em;
+            color: var(--text);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .logo em {
+            font-style: normal;
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        nav button:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        nav button.active {
+            color: var(--accent);
+            background: rgba(91, 110, 245, 0.1);
+            box-shadow: 0 0 0 1px rgba(91, 110, 245, 0.2);
+        }
+
+        main {
+            position: relative;
+            z-index: 2;
+            padding: 2.5rem 2rem 4rem;
+            max-width: 1380px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            display: none;
+            animation: panelIn 0.4s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes panelIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-heading {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+        }
+
+        .section-heading strong {
+            font-weight: 600;
+        }
+
+        .section-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            box-shadow: var(--glass-shadow);
+            transition: box-shadow 0.3s ease, background 0.3s ease;
+        }
+
+        .card:hover {
+            background: var(--glass-hover);
+            box-shadow: 0 12px 50px rgba(100, 110, 160, 0.18), 0 1.5px 0 rgba(255, 255, 255, 0.95) inset;
+        }
+
+        .card-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.12rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .badge-classic {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--accent2);
+        }
+
+        .badge-modern {
+            background: rgba(91, 110, 245, 0.1);
+            color: var(--accent);
+        }
+
+        .badge-hash {
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--accent3);
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.25rem;
+        }
+
+        @media(max-width:800px) {
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        textarea,
+        input[type=text],
+        input[type=number],
+        select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.83rem;
+            padding: 0.6rem 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 2px 8px rgba(100, 110, 160, 0.06);
+            -webkit-appearance: none;
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            border-color: rgba(91, 110, 245, 0.45);
+            background: rgba(255, 255, 255, 0.72);
+            box-shadow: 0 0 0 3px rgba(91, 110, 245, 0.1), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+            line-height: 1.65;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.52rem 1.2rem;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.83rem;
+            font-weight: 500;
+            transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+            pointer-events: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6b7ff5 0%, #5b6ef5 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(91, 110, 245, 0.3), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 24px rgba(91, 110, 245, 0.4), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-soft);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 2px 8px rgba(100, 110, 160, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.2);
+        }
+
+        .btn-sm {
+            padding: 0.38rem 0.9rem;
+            font-size: 0.78rem;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.9rem;
+        }
+
+        .key-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .key-row input {
+            flex: 1;
+        }
+
+        .key-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 0.4rem 0.65rem;
+            white-space: nowrap;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+            flex-shrink: 0;
+        }
+
+        .output {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.9rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.82rem;
+            min-height: 56px;
+            word-break: break-all;
+            line-height: 1.7;
+            color: var(--accent);
+            margin-top: 0.85rem;
+            position: relative;
+            white-space: pre-wrap;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 0.18rem 0.55rem;
+            font-size: 0.68rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--accent);
+            border-color: rgba(91, 110, 245, 0.3);
+        }
+
+        .cat-pills {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.75rem;
+        }
+
+        .cat-pill {
+            padding: 0.38rem 1rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.22s ease;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+        }
+
+        .cat-pill:hover {
+            background: rgba(255, 255, 255, 0.75);
+            color: var(--text);
+        }
+
+        .cat-pill.active {
+            background: linear-gradient(135deg, rgba(107, 127, 245, 0.15) 0%, rgba(91, 110, 245, 0.08) 100%);
+            border-color: rgba(91, 110, 245, 0.3);
+            color: var(--accent);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 2px 8px rgba(91, 110, 245, 0.1);
+        }
+
+        .mini-tabs {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .mini-tab {
+            padding: 0.32rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            cursor: pointer;
+            background: none;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .mini-tab.active {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(255, 255, 255, 0.9);
+            color: var(--accent);
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        @media(max-width:580px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .swap-btn {
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            color: var(--text-muted);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 2px 8px rgba(100, 110, 160, 0.1), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+            flex-shrink: 0;
+        }
+
+        .swap-btn:hover {
+            color: var(--accent);
+            border-color: rgba(91, 110, 245, 0.3);
+            transform: rotate(180deg);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .hash-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.85rem;
+        }
+
+        .hash-item {
+            background: rgba(255, 255, 255, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: 12px;
+            padding: 0.65rem 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            transition: background 0.2s;
+        }
+
+        .hash-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .hash-algo {
+            font-size: 0.63rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent2);
+            min-width: 68px;
+            padding-top: 0.1rem;
+            flex-shrink: 0;
+        }
+
+        .hash-val {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.77rem;
+            word-break: break-all;
+            color: var(--text-soft);
+            flex: 1;
+            line-height: 1.6;
+        }
+
+        .base-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+
+        @media(max-width:500px) {
+            .base-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .base-item {
+            background: rgba(255, 255, 255, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 0.65rem 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .base-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .base-label {
+            font-size: 0.63rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+
+        .base-val {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--accent);
+            word-break: break-all;
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 88px;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+        }
+
+        input[type=color] {
+            width: 46px;
+            height: 40px;
+            padding: 3px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+        }
+
+        .color-conv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem 1.5rem;
+        }
+
+        .color-conv-item {
+            font-size: 0.78rem;
+            display: flex;
+            gap: 0.4rem;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .color-conv-key {
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .color-conv-val {
+            color: var(--text-soft);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.76rem;
+            cursor: pointer;
+        }
+
+        .color-conv-val:hover {
+            color: var(--accent);
+        }
+
+        .palette-swatch {
+            flex: 1;
+            min-width: 55px;
+            height: 76px;
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0.35rem;
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(.4, 0, .2, 1), box-shadow 0.25s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+        }
+
+        .palette-swatch:hover {
+            transform: scale(1.06) translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        .swatch-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            background: rgba(0, 0, 0, 0.35);
+            color: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            padding: 0.08rem 0.35rem;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem 1.5rem;
+            margin-top: 0.85rem;
+        }
+
+        .stat-item {
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(180, 190, 220, 0.15);
+        }
+
+        .stat-key {
+            color: var(--text-muted);
+        }
+
+        .stat-val {
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.77rem;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            color: var(--accent);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            font-size: 0.85rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 999px;
+            box-shadow: 0 8px 32px rgba(91, 110, 245, 0.15), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+            transform: translateY(80px) scale(0.95);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        #toast.show {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        #contrast-preview {
+            padding: 1.75rem;
+            border-radius: 14px;
+            text-align: center;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.3s;
+        }
+
+        .unit-formula {
+            margin-top: 1rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: 10px;
+            padding: 0.6rem 0.9rem;
+        }
+
+        .regex-match {
+            background: rgba(91, 110, 245, 0.15);
+            color: var(--accent);
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(180, 190, 220, 0.4);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-wrap">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+    </div>
+    <div id="toast">Copied to clipboard</div>
+
+    <header>
+        <div class="logo">Crypto<em>Tools</em></div>
+        <nav>
+            <button class="active" onclick="showPanel('encode')">Encode &amp; Decode</button>
+            <button onclick="showPanel('hash')">Hash</button>
+            <button onclick="showPanel('convert')">Unit Converter</button>
+            <button onclick="showPanel('base')">Base Convert</button>
+            <button onclick="showPanel('color')">Color Tools</button>
+            <button onclick="showPanel('misc')">Misc Tools</button>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- ENCODE / DECODE -->
+        <div class="panel active" id="panel-encode">
+            <h2 class="section-heading"><strong>Encode</strong> &amp; Decode</h2>
+            <p class="section-sub">Classical ciphers, modern encodings, and everything in between.</p>
+            <div class="cat-pills">
+                <div class="cat-pill active" onclick="filterCat('all',this)">All</div>
+                <div class="cat-pill" onclick="filterCat('classic',this)">Classical</div>
+                <div class="cat-pill" onclick="filterCat('modern',this)">Modern</div>
+                <div class="cat-pill" onclick="filterCat('substitution',this)">Substitution</div>
+                <div class="cat-pill" onclick="filterCat('transposition',this)">Transposition</div>
+                <div class="cat-pill" onclick="filterCat('code',this)">Codes</div>
+            </div>
+            <div class="tool-grid" id="encode-grid">
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Caesar Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="caesar-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Shift</span><input
+                            type="number" id="caesar-key" value="13" min="1" max="25" style="width:90px;flex:0 0 auto">
+                    </div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="caesarDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="caesarDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('caesar-in','caesar-out')">Clear</button></div>
+                    <div class="output" id="caesar-out"><button class="copy-btn"
+                            onclick="copyOut('caesar-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">ROT13 <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="rot13-in" placeholder="ROT13 is its own inverse…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="doRot13()">Apply
+                            ROT13</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('rot13-in','rot13-out')">Clear</button></div>
+                    <div class="output" id="rot13-out"><button class="copy-btn"
+                            onclick="copyOut('rot13-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Vigenère Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="vig-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Key</span><input type="text"
+                            id="vig-key" value="SECRET" placeholder="keyword"></div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="vigenereDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="vigenereDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('vig-in','vig-out')">Clear</button></div>
+                    <div class="output" id="vig-out"><button class="copy-btn" onclick="copyOut('vig-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Atbash Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text (A↔Z, B↔Y …)</label>
+                    <textarea id="atbash-in" placeholder="Enter text…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="doAtbash()">Apply
+                            Atbash</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('atbash-in','atbash-out')">Clear</button></div>
+                    <div class="output" id="atbash-out"><button class="copy-btn"
+                            onclick="copyOut('atbash-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Affine Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="affine-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem;flex-wrap:wrap"><span class="key-badge">a</span><input
+                            type="number" id="affine-a" value="5" min="1" max="25"
+                            style="width:80px;flex:0 0 auto"><span class="key-badge">b</span><input type="number"
+                            id="affine-b" value="8" min="0" max="25" style="width:80px;flex:0 0 auto"></div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="affineDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="affineDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('affine-in','affine-out')">Clear</button></div>
+                    <div class="output" id="affine-out"><button class="copy-btn"
+                            onclick="copyOut('affine-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic transposition">
+                    <div class="card-title">Rail Fence Cipher <span class="badge badge-classic">Transposition</span>
+                    </div>
+                    <label>Input Text</label>
+                    <textarea id="rail-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Rails</span><input
+                            type="number" id="rail-key" value="3" min="2" max="10" style="width:80px;flex:0 0 auto">
+                    </div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="railDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="railDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('rail-in','rail-out')">Clear</button></div>
+                    <div class="output" id="rail-out"><button class="copy-btn"
+                            onclick="copyOut('rail-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic transposition">
+                    <div class="card-title">Columnar Transposition <span
+                            class="badge badge-classic">Transposition</span></div>
+                    <label>Input Text</label>
+                    <textarea id="col-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Key</span><input type="text"
+                            id="col-key" value="ZEBRA"></div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="columnarDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="columnarDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('col-in','col-out')">Clear</button></div>
+                    <div class="output" id="col-out"><button class="copy-btn" onclick="copyOut('col-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Bacon's Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="bacon-in" placeholder="Enter text…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="baconDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="baconDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('bacon-in','bacon-out')">Clear</button></div>
+                    <div class="output" id="bacon-out"><button class="copy-btn"
+                            onclick="copyOut('bacon-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Polybius Square <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="polybius-in" placeholder="Enter text…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="polybiusDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="polybiusDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('polybius-in','polybius-out')">Clear</button></div>
+                    <div class="output" id="polybius-out"><button class="copy-btn"
+                            onclick="copyOut('polybius-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Playfair Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="play-in" placeholder="I/J treated as same…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Key</span><input type="text"
+                            id="play-key" value="MONARCHY"></div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="playfairDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="playfairDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('play-in','play-out')">Clear</button></div>
+                    <div class="output" id="play-out"><button class="copy-btn"
+                            onclick="copyOut('play-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="modern">
+                    <div class="card-title">Base64 <span class="badge badge-modern">Encoding</span></div>
+                    <label>Input Text</label>
+                    <textarea id="b64-in" placeholder="Enter text or Base64…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="b64Do(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="b64Do(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('b64-in','b64-out')">Clear</button></div>
+                    <div class="output" id="b64-out"><button class="copy-btn" onclick="copyOut('b64-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="modern">
+                    <div class="card-title">URL Encoding <span class="badge badge-modern">Encoding</span></div>
+                    <label>Input Text</label>
+                    <textarea id="url-in" placeholder="Enter text or URL-encoded string…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="urlDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="urlDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('url-in','url-out')">Clear</button></div>
+                    <div class="output" id="url-out"><button class="copy-btn" onclick="copyOut('url-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="modern">
+                    <div class="card-title">HTML Entities <span class="badge badge-modern">Encoding</span></div>
+                    <label>Input Text</label>
+                    <textarea id="html-in" placeholder="Enter text or HTML entities…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm"
+                            onclick="htmlDo(true)">Encode</button><button class="btn btn-secondary btn-sm"
+                            onclick="htmlDo(false)">Decode</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('html-in','html-out')">Clear</button></div>
+                    <div class="output" id="html-out"><button class="copy-btn"
+                            onclick="copyOut('html-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="code">
+                    <div class="card-title">Morse Code <span class="badge badge-classic">Code</span></div>
+                    <label>Text or morse (space between letters, / between words)</label>
+                    <textarea id="morse-in" placeholder="SOS = ... --- ..."></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="morseDo(true)">To
+                            Morse</button><button class="btn btn-secondary btn-sm" onclick="morseDo(false)">From
+                            Morse</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('morse-in','morse-out')">Clear</button></div>
+                    <div class="output" id="morse-out"><button class="copy-btn"
+                            onclick="copyOut('morse-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="modern code">
+                    <div class="card-title">Binary Text <span class="badge badge-modern">Encoding</span></div>
+                    <label>Input Text</label>
+                    <textarea id="bin-in" placeholder="Enter text or binary (space-separated bytes)…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="binDo(true)">To
+                            Binary</button><button class="btn btn-secondary btn-sm" onclick="binDo(false)">From
+                            Binary</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('bin-in','bin-out')">Clear</button></div>
+                    <div class="output" id="bin-out"><button class="copy-btn" onclick="copyOut('bin-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="modern code">
+                    <div class="card-title">Hex Encoding <span class="badge badge-modern">Encoding</span></div>
+                    <label>Input Text</label>
+                    <textarea id="hex-in" placeholder="Enter text or hex string…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="hexDo(true)">To
+                            Hex</button><button class="btn btn-secondary btn-sm" onclick="hexDo(false)">From
+                            Hex</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('hex-in','hex-out')">Clear</button></div>
+                    <div class="output" id="hex-out"><button class="copy-btn" onclick="copyOut('hex-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="modern">
+                    <div class="card-title">XOR Cipher <span class="badge badge-modern">Symmetric</span></div>
+                    <label>Input Text</label>
+                    <textarea id="xor-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Key</span><input type="text"
+                            id="xor-key" value="key123"></div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="xorDo()">Apply
+                            XOR</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('xor-in','xor-out')">Clear</button></div>
+                    <div class="output" id="xor-out"><button class="copy-btn" onclick="copyOut('xor-out')">copy</button>
+                    </div>
+                </div>
+
+                <div class="card" data-cat="classic substitution">
+                    <div class="card-title">Beaufort Cipher <span class="badge badge-classic">Classical</span></div>
+                    <label>Input Text</label>
+                    <textarea id="beau-in" placeholder="Enter text…"></textarea>
+                    <div class="key-row" style="margin-top:.75rem"><span class="key-badge">Key</span><input type="text"
+                            id="beau-key" value="BEAUFORT"></div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="beaufortDo()">Apply
+                            (self-inverse)</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('beau-in','beau-out')">Clear</button></div>
+                    <div class="output" id="beau-out"><button class="copy-btn"
+                            onclick="copyOut('beau-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="code">
+                    <div class="card-title">NATO Phonetic <span class="badge badge-classic">Code</span></div>
+                    <label>Input Text</label>
+                    <textarea id="nato-in" placeholder="Enter text or NATO words…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="natoDo(true)">To
+                            NATO</button><button class="btn btn-secondary btn-sm" onclick="natoDo(false)">From
+                            NATO</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('nato-in','nato-out')">Clear</button></div>
+                    <div class="output" id="nato-out"><button class="copy-btn"
+                            onclick="copyOut('nato-out')">copy</button></div>
+                </div>
+
+                <div class="card" data-cat="code modern">
+                    <div class="card-title">Baudot / ITA2 <span class="badge badge-modern">Telegraph</span></div>
+                    <label>Input Text</label>
+                    <textarea id="baudot-in" placeholder="Enter text…"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="baudotDo(true)">To
+                            Baudot</button><button class="btn btn-secondary btn-sm" onclick="baudotDo(false)">From
+                            Baudot</button><button class="btn btn-danger btn-sm"
+                            onclick="clear2('baudot-in','baudot-out')">Clear</button></div>
+                    <div class="output" id="baudot-out"><button class="copy-btn"
+                            onclick="copyOut('baudot-out')">copy</button></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- HASH -->
+        <div class="panel" id="panel-hash">
+            <h2 class="section-heading"><strong>Hash</strong> Functions</h2>
+            <p class="section-sub">One-way cryptographic hashes — MD5, SHA family, HMAC and more.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;max-width:900px">
+                <div class="card" style="grid-column:1/-1">
+                    <div class="card-title">Multi-Hash Generator <span class="badge badge-hash">Hash</span></div>
+                    <label>Input Text</label>
+                    <textarea id="hash-in" placeholder="Type to instantly compute all hashes…" style="height:80px"
+                        oninput="generateHashes()"></textarea>
+                    <div class="hash-row" id="hash-results">
+                        <div style="color:var(--text-muted);font-size:.82rem;padding:.5rem 0">Type above to see hashes…
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="grid-column:1/-1">
+                    <div class="card-title">HMAC Generator <span class="badge badge-hash">Hash</span></div>
+                    <label>Message</label>
+                    <textarea id="hmac-msg" placeholder="Enter message…" style="height:70px"></textarea>
+                    <div class="key-row" style="margin-top:.75rem;flex-wrap:wrap;gap:.5rem">
+                        <span class="key-badge">Key</span>
+                        <input type="text" id="hmac-key" value="secret" placeholder="Secret key"
+                            style="flex:1;min-width:120px">
+                        <select id="hmac-algo" style="width:auto">
+                            <option>SHA-256</option>
+                            <option>SHA-384</option>
+                            <option>SHA-512</option>
+                            <option>SHA-1</option>
+                        </select>
+                    </div>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="generateHMAC()">Generate
+                            HMAC</button></div>
+                    <div class="output" id="hmac-out"><button class="copy-btn"
+                            onclick="copyOut('hmac-out')">copy</button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT CONVERTER -->
+        <div class="panel" id="panel-convert">
+            <h2 class="section-heading"><strong>Unit</strong> Converter</h2>
+            <p class="section-sub">Length, weight, temperature, area, volume, speed, data, time, energy, pressure &amp;
+                angle.</p>
+            <div class="cat-pills">
+                <div class="cat-pill active" onclick="setUnitCat('length',this)">Length</div>
+                <div class="cat-pill" onclick="setUnitCat('weight',this)">Weight</div>
+                <div class="cat-pill" onclick="setUnitCat('temperature',this)">Temperature</div>
+                <div class="cat-pill" onclick="setUnitCat('area',this)">Area</div>
+                <div class="cat-pill" onclick="setUnitCat('volume',this)">Volume</div>
+                <div class="cat-pill" onclick="setUnitCat('speed',this)">Speed</div>
+                <div class="cat-pill" onclick="setUnitCat('data',this)">Data</div>
+                <div class="cat-pill" onclick="setUnitCat('time',this)">Time</div>
+                <div class="cat-pill" onclick="setUnitCat('energy',this)">Energy</div>
+                <div class="cat-pill" onclick="setUnitCat('pressure',this)">Pressure</div>
+                <div class="cat-pill" onclick="setUnitCat('angle',this)">Angle</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(300px,560px) 1fr;gap:1.25rem;max-width:1100px">
+                <div class="card">
+                    <div class="converter-grid">
+                        <div><label>From</label><select id="unit-from" onchange="doUnitConvert()"
+                                style="width:100%;margin-bottom:.6rem"></select><input type="number" id="unit-val"
+                                value="1" oninput="doUnitConvert()" style="width:100%"></div>
+                        <button class="swap-btn" onclick="swapUnits()">⇄</button>
+                        <div><label>To</label><select id="unit-to" onchange="doUnitConvert()"
+                                style="width:100%;margin-bottom:.6rem"></select><input type="text" id="unit-result"
+                                readonly
+                                style="width:100%;background:rgba(91,110,245,.06);color:var(--accent);border-color:rgba(91,110,245,.2)">
+                        </div>
+                    </div>
+                    <div class="unit-formula" id="unit-formula"></div>
+                </div>
+                <div class="card" style="overflow:auto;max-height:320px">
+                    <div class="card-title">All Units</div>
+                    <div id="unit-table"
+                        style="font-family:'DM Mono',monospace;font-size:.78rem;line-height:2.1;color:var(--text-muted)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BASE CONVERT -->
+        <div class="panel" id="panel-base">
+            <h2 class="section-heading"><strong>Base</strong> Converter</h2>
+            <p class="section-sub">Convert between Binary, Octal, Decimal, Hex, and any custom base.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;max-width:860px">
+                <div class="card" style="grid-column:1/-1">
+                    <div class="card-title">Multi-Base Converter</div>
+                    <div style="display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap">
+                        <input type="text" id="base-in" placeholder="Enter number…" style="flex:1;min-width:140px"
+                            oninput="doBaseConvert()">
+                        <select id="base-from" onchange="doBaseConvert()" style="width:160px">
+                            <option value="2">Binary (2)</option>
+                            <option value="8">Octal (8)</option>
+                            <option value="10" selected>Decimal (10)</option>
+                            <option value="16">Hex (16)</option>
+                            <option value="32">Base 32</option>
+                            <option value="36">Base 36</option>
+                        </select>
+                    </div>
+                    <div class="base-grid" id="base-results"></div>
+                </div>
+                <div class="card" style="grid-column:1/-1">
+                    <div class="card-title">Arbitrary Base Converter</div>
+                    <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:end">
+                        <div style="flex:1;min-width:120px"><label>Number</label><input type="text" id="arb-in"
+                                placeholder="Input" oninput="doArbBase()"></div>
+                        <div><label>From Base</label><input type="number" id="arb-from" value="10" min="2" max="36"
+                                style="width:90px" oninput="doArbBase()"></div>
+                        <div><label>To Base</label><input type="number" id="arb-to" value="2" min="2" max="36"
+                                style="width:90px" oninput="doArbBase()"></div>
+                    </div>
+                    <div class="output" id="arb-out" style="margin-top:.85rem"><button class="copy-btn"
+                            onclick="copyOut('arb-out')">copy</button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLOR TOOLS -->
+        <div class="panel" id="panel-color">
+            <h2 class="section-heading"><strong>Color</strong> Tools</h2>
+            <p class="section-sub">Convert between color spaces, generate palettes, and check accessibility.</p>
+            <div class="tool-grid">
+                <div class="card">
+                    <div class="card-title">Color Converter</div>
+                    <div class="color-preview" id="color-preview" style="background:#5b6ef5"></div>
+                    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.85rem">
+                        <input type="color" id="color-picker" value="#5b6ef5" oninput="onColorPick(this.value)">
+                        <input type="text" id="color-hex-in" value="#5b6ef5" placeholder="#rrggbb" style="flex:1"
+                            oninput="onHexType(this.value)">
+                    </div>
+                    <div class="color-conv-grid" id="color-conversions"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Palette Generator</div>
+                    <div style="display:flex;gap:.5rem;margin-bottom:1rem;align-items:end">
+                        <div><label>Color</label><input type="color" id="pal-color" value="#5b6ef5"
+                                oninput="genPalette()"></div>
+                        <div style="flex:1"><label>Type</label><select id="pal-type" onchange="genPalette()">
+                                <option value="complementary">Complementary</option>
+                                <option value="analogous">Analogous</option>
+                                <option value="triadic">Triadic</option>
+                                <option value="split">Split Complementary</option>
+                                <option value="tetradic">Tetradic</option>
+                                <option value="tints">Tints</option>
+                                <option value="shades">Shades</option>
+                            </select></div>
+                    </div>
+                    <div id="palette-swatches" style="display:flex;gap:.5rem;flex-wrap:wrap"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Contrast Checker <span class="badge badge-modern">WCAG</span></div>
+                    <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+                        <div><label>Foreground</label><input type="color" id="fg-color" value="#1a1d2e"
+                                oninput="checkContrast()"></div>
+                        <div><label>Background</label><input type="color" id="bg-color" value="#ffffff"
+                                oninput="checkContrast()"></div>
+                    </div>
+                    <div id="contrast-preview">
+                        <p style="font-size:1.1rem;font-weight:600;margin-bottom:.3rem">Sample Text Preview</p>
+                        <p style="font-size:.85rem;opacity:.7">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                    <div id="contrast-result" style="font-size:.82rem;line-height:2.2"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Color Name Finder</div>
+                    <div style="display:flex;gap:.5rem;margin-bottom:.85rem;align-items:end">
+                        <div><label>Pick</label><input type="color" id="name-color" value="#ff6b6b"
+                                oninput="findColorName(this.value)"></div>
+                        <div style="flex:1"><label>Hex</label><input type="text" id="name-hex" value="#ff6b6b"
+                                placeholder="#rrggbb" oninput="findColorNameFromText(this.value)"></div>
+                    </div>
+                    <div class="color-preview" id="name-preview" style="background:#ff6b6b;height:64px"></div>
+                    <div id="name-result" style="margin-top:.75rem;font-size:.85rem;line-height:1.9"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MISC TOOLS -->
+        <div class="panel" id="panel-misc">
+            <h2 class="section-heading"><strong>Misc</strong> Tools</h2>
+            <p class="section-sub">Text utilities, random generators, timestamps, and more.</p>
+            <div class="tool-grid">
+
+                <div class="card">
+                    <div class="card-title">Text Statistics</div>
+                    <textarea id="stat-in" placeholder="Paste any text…" style="height:120px"
+                        oninput="doStats()"></textarea>
+                    <div class="stat-grid" id="stat-out"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Random Generator</div>
+                    <div class="mini-tabs">
+                        <button class="mini-tab active" onclick="setRandTab('password',this)">Password</button>
+                        <button class="mini-tab" onclick="setRandTab('uuid',this)">UUID</button>
+                        <button class="mini-tab" onclick="setRandTab('number',this)">Number</button>
+                        <button class="mini-tab" onclick="setRandTab('bytes',this)">Hex Bytes</button>
+                    </div>
+                    <div id="rand-password-opts">
+                        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem">
+                            <div><label>Length</label><input type="number" id="rand-len" value="16" min="4" max="128"
+                                    style="width:85px"></div>
+                            <div
+                                style="display:flex;align-items:flex-end;gap:.75rem;flex-wrap:wrap;padding-bottom:.05rem">
+                                <label
+                                    style="display:flex;align-items:center;gap:.3rem;color:var(--text-soft);cursor:pointer"><input
+                                        type="checkbox" id="rand-upper" checked> Uppercase</label>
+                                <label
+                                    style="display:flex;align-items:center;gap:.3rem;color:var(--text-soft);cursor:pointer"><input
+                                        type="checkbox" id="rand-num" checked> Numbers</label>
+                                <label
+                                    style="display:flex;align-items:center;gap:.3rem;color:var(--text-soft);cursor:pointer"><input
+                                        type="checkbox" id="rand-sym" checked> Symbols</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="rand-uuid-opts" style="display:none;margin-bottom:.75rem"><label>Version</label><select
+                            id="rand-uuid-ver">
+                            <option value="4">v4 (Random)</option>
+                            <option value="1">v1 (Timestamp)</option>
+                        </select></div>
+                    <div id="rand-number-opts" style="display:none">
+                        <div style="display:flex;gap:.5rem;margin-bottom:.75rem">
+                            <div><label>Min</label><input type="number" id="rand-min" value="1" style="width:100px">
+                            </div>
+                            <div><label>Max</label><input type="number" id="rand-max" value="100" style="width:100px">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="rand-bytes-opts" style="display:none">
+                        <div style="margin-bottom:.75rem"><label>Byte Count</label><input type="number"
+                                id="rand-byte-cnt" value="16" min="1" max="256" style="width:100px"></div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="generateRandom()">Generate</button>
+                    <div class="output" id="rand-out" style="margin-top:.85rem"><button class="copy-btn"
+                            onclick="copyOut('rand-out')">copy</button></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Timestamp Converter</div>
+                    <div style="display:flex;gap:.5rem;margin-bottom:.85rem">
+                        <input type="number" id="ts-unix" placeholder="Unix timestamp…" style="flex:1"
+                            oninput="tsFromUnix()">
+                        <button class="btn btn-secondary btn-sm" onclick="tsNow()">Now</button>
+                    </div>
+                    <div id="ts-results"
+                        style="font-family:'DM Mono',monospace;font-size:.78rem;line-height:2.2;color:var(--text-muted)">
+                    </div>
+                    <div style="margin-top:1rem;border-top:1px solid rgba(180,190,220,.2);padding-top:1rem">
+                        <label>Date / Time → Unix</label>
+                        <input type="datetime-local" id="ts-dt" style="width:100%;margin-top:.35rem"
+                            onchange="tsFromDate()">
+                        <div class="output" id="ts-unix-out" style="margin-top:.6rem"><button class="copy-btn"
+                                onclick="copyOut('ts-unix-out')">copy</button></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">String Transformer</div>
+                    <textarea id="transform-in" placeholder="Enter text to transform…" style="height:90px"></textarea>
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.85rem">
+                        <button class="btn btn-secondary btn-sm" onclick="transform('upper')">UPPER</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('lower')">lower</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('title')">Title</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('snake')">snake_case</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('camel')">camelCase</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('kebab')">kebab-case</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('pascal')">PascalCase</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('reverse')">Reverse</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('flip')">ɟlᴉd</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('trim')">Trim</button>
+                        <button class="btn btn-secondary btn-sm" onclick="transform('nodups')">No Dups</button>
+                    </div>
+                    <div class="output" id="transform-out" style="margin-top:.85rem"><button class="copy-btn"
+                            onclick="copyOut('transform-out')">copy</button></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">JSON Formatter</div>
+                    <div class="mini-tabs">
+                        <button class="mini-tab active" onclick="setJsonTab('format',this)">Format</button>
+                        <button class="mini-tab" onclick="setJsonTab('minify',this)">Minify</button>
+                        <button class="mini-tab" onclick="setJsonTab('validate',this)">Validate</button>
+                    </div>
+                    <textarea id="json-in" placeholder='{"key": "value"}' style="height:120px"></textarea>
+                    <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="doJSON()">Apply</button><button
+                            class="btn btn-danger btn-sm" onclick="clear2('json-in','json-out')">Clear</button></div>
+                    <div class="output" id="json-out" style="height:120px;overflow:auto"><button class="copy-btn"
+                            onclick="copyOut('json-out')">copy</button></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Regex Tester</div>
+                    <label>Pattern</label>
+                    <div style="display:flex;gap:.5rem;margin-bottom:.85rem">
+                        <input type="text" id="regex-pattern" placeholder="([a-z]+)" style="flex:1" oninput="doRegex()">
+                        <input type="text" id="regex-flags" value="gi" style="width:62px" oninput="doRegex()"
+                            placeholder="flags">
+                    </div>
+                    <label>Test String</label>
+                    <textarea id="regex-in" placeholder="Enter test string…" style="height:80px"
+                        oninput="doRegex()"></textarea>
+                    <div id="regex-out"
+                        style="margin-top:.85rem;font-size:.82rem;line-height:1.85;font-family:'DM Mono',monospace">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // NAV
+        function showPanel(id) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById('panel-' + id).classList.add('active'); const m = { encode: 0, hash: 1, convert: 2, base: 3, color: 4, misc: 5 }; document.querySelectorAll('nav button').forEach(b => b.classList.remove('active')); document.querySelectorAll('nav button')[m[id]].classList.add('active'); }
+        // UTILS
+        function setOut(id, val) { const el = document.getElementById(id), btn = el.querySelector('.copy-btn'); el.textContent = val; if (btn) el.appendChild(btn); }
+        function copyOut(id) { const el = document.getElementById(id), text = el.textContent.replace('copy', '').trim(); navigator.clipboard.writeText(text).then(() => { const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }); }
+        function clear2(a, b) { document.getElementById(a).value = ''; setOut(b, ''); }
+        function filterCat(cat, el) { document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active')); el.classList.add('active'); document.querySelectorAll('#encode-grid .card').forEach(c => { if (cat === 'all') { c.style.display = ''; return; } c.style.display = (c.dataset.cat || '').split(' ').includes(cat) ? '' : 'none'; }); }
+        // CIPHERS
+        function caesarDo(enc) { const t = document.getElementById('caesar-in').value, shift = ((parseInt(document.getElementById('caesar-key').value) % 26) + 26) % 26, s = enc ? shift : (26 - shift) % 26; setOut('caesar-out', t.replace(/[a-zA-Z]/g, c => { const b = c >= 'a' ? 97 : 65; return String.fromCharCode(((c.charCodeAt(0) - b + s) % 26) + b); })); }
+        function doRot13() { setOut('rot13-out', document.getElementById('rot13-in').value.replace(/[a-zA-Z]/g, c => { const b = c >= 'a' ? 97 : 65; return String.fromCharCode(((c.charCodeAt(0) - b + 13) % 26) + b); })); }
+        function vigenereDo(enc) { const t = document.getElementById('vig-in').value, key = document.getElementById('vig-key').value.toUpperCase().replace(/[^A-Z]/g, '') || 'A'; let ki = 0, r = ''; for (const ch of t) { if (/[a-zA-Z]/.test(ch)) { const b = ch >= 'a' ? 97 : 65, k = key.charCodeAt(ki++ % key.length) - 65; r += String.fromCharCode(((ch.charCodeAt(0) - b + (enc ? k : 26 - k)) % 26) + b); } else r += ch; } setOut('vig-out', r); }
+        function doAtbash() { setOut('atbash-out', document.getElementById('atbash-in').value.replace(/[a-zA-Z]/g, c => { const b = c >= 'a' ? 97 : 65; return String.fromCharCode(b + 25 - (c.charCodeAt(0) - b)); })); }
+        function modInverse(a, m) { for (let x = 1; x < m; x++)if ((a * x) % m === 1) return x; return -1; }
+        function affineDo(enc) { const a = parseInt(document.getElementById('affine-a').value), b = parseInt(document.getElementById('affine-b').value), aInv = modInverse(a, 26); if (aInv === -1) { setOut('affine-out', 'Error: a must be coprime to 26'); return; } setOut('affine-out', document.getElementById('affine-in').value.replace(/[a-zA-Z]/g, c => { const base = c >= 'a' ? 97 : 65, x = c.charCodeAt(0) - base; return String.fromCharCode((enc ? (a * x + b) % 26 : (aInv * (x - b + 26)) % 26) + base); })); }
+        function railFenceEncode(t, n) { const f = Array.from({ length: n }, () => []); let r = 0, d = 1; for (const c of t) { f[r].push(c); if (r === 0) d = 1; else if (r === n - 1) d = -1; r += d; } return f.flat().join(''); }
+        function railFenceDecode(t, n) { const len = t.length, idx = Array(len).fill(0); let r = 0, d = 1; for (let i = 0; i < len; i++) { idx[i] = r; if (r === 0) d = 1; else if (r === n - 1) d = -1; r += d; } const order = [...Array(len).keys()].sort((a, b) => idx[a] - idx[b] || a - b), res = Array(len); for (let i = 0; i < len; i++)res[order[i]] = t[i]; return res.join(''); }
+        function railDo(enc) { const t = document.getElementById('rail-in').value, n = parseInt(document.getElementById('rail-key').value); setOut('rail-out', enc ? railFenceEncode(t, n) : railFenceDecode(t, n)); }
+        function columnarDo(enc) { const t = document.getElementById('col-in').value.replace(/\s/g, ''), key = document.getElementById('col-key').value.toUpperCase(), order = [...key].map((c, i) => [c, i]).sort().map(x => x[1]), cols = key.length, rows = Math.ceil(t.length / cols); if (enc) { const grid = []; for (let r = 0; r < rows; r++)grid.push(t.substr(r * cols, cols).padEnd(cols, 'X').split('')); setOut('col-out', order.map(c => grid.map(r => r[c]).join('')).join(' ')); } else { const colData = {}; let pos = 0; order.forEach(oc => { colData[oc] = t.replace(/\s/g, '').substr(pos, rows); pos += rows; }); let res = ''; for (let r = 0; r < rows; r++)for (let c = 0; c < cols; c++)res += colData[c]?.[r] || ''; setOut('col-out', res.replace(/X+$/, '')); } }
+        const BACON = { A: 'AAAAA', B: 'AAAAB', C: 'AAABA', D: 'AAABB', E: 'AABAA', F: 'AABAB', G: 'AABBA', H: 'AABBB', I: 'ABAAA', J: 'ABAAA', K: 'ABAAB', L: 'ABABA', M: 'ABABB', N: 'ABBAA', O: 'ABBAB', P: 'ABBBA', Q: 'ABBBB', R: 'BAAAA', S: 'BAAAB', T: 'BAABA', U: 'BAABB', V: 'BABAA', W: 'BABAB', X: 'BABBA', Y: 'BABBB', Z: 'BBAAA' }, BACON_INV = Object.fromEntries(Object.entries(BACON).map(([k, v]) => [v, k]));
+        function baconDo(enc) { const t = document.getElementById('bacon-in').value; if (enc) setOut('bacon-out', t.toUpperCase().replace(/[A-Z]/g, c => BACON[c] || c)); else { const cl = t.toUpperCase().replace(/[^AB]/g, ''); let r = ''; for (let i = 0; i < cl.length; i += 5)r += BACON_INV[cl.substr(i, 5)] || '?'; setOut('bacon-out', r); } }
+        function polybiusDo(enc) { const sq = 'ABCDEFGHIKLMNOPQRSTUVWXYZ', t = document.getElementById('polybius-in').value; if (enc) setOut('polybius-out', t.toUpperCase().replace(/J/g, 'I').replace(/[A-Z]/g, c => { const i = sq.indexOf(c); return i >= 0 ? `${Math.floor(i / 5) + 1}${(i % 5) + 1}` : c; })); else { const d = t.replace(/\s/g, ''); let r = ''; for (let i = 0; i < d.length; i += 2) { const r2 = parseInt(d[i]) - 1, c = parseInt(d[i + 1]) - 1; if (!isNaN(r2) && !isNaN(c)) r += sq[r2 * 5 + c] || '?'; } setOut('polybius-out', r); } }
+        function makePlayfairMatrix(key) { const seen = new Set(), mat = []; const k = (key.toUpperCase().replace(/J/g, 'I') + 'ABCDEFGHIKLMNOPQRSTUVWXYZ').replace(/[^A-Z]/g, ''); for (const c of k) if (!seen.has(c)) { seen.add(c); mat.push(c); } return mat; }
+        function playfairDo(enc) { const key = document.getElementById('play-key').value; let t = document.getElementById('play-in').value.toUpperCase().replace(/J/g, 'I').replace(/[^A-Z]/g, ''); const mat = makePlayfairMatrix(key), pos = {}; mat.forEach((c, i) => { pos[c] = { r: Math.floor(i / 5), c: i % 5 }; }); let pairs = [], i = 0; while (i < t.length) { let a = t[i], b = t[i + 1] || 'X'; if (a === b) { b = 'X'; i++; } else i += 2; pairs.push([a, b]); } const d = enc ? 1 : -1; setOut('play-out', pairs.map(([a, b]) => { const pa = pos[a], pb = pos[b]; if (pa.r === pb.r) return mat[pa.r * 5 + ((pa.c + d + 5) % 5)] + mat[pb.r * 5 + ((pb.c + d + 5) % 5)]; if (pa.c === pb.c) return mat[((pa.r + d + 5) % 5) * 5 + pa.c] + mat[((pb.r + d + 5) % 5) * 5 + pb.c]; return mat[pa.r * 5 + pb.c] + mat[pb.r * 5 + pa.c]; }).join('')); }
+        function b64Do(enc) { try { const t = document.getElementById('b64-in').value; setOut('b64-out', enc ? btoa(unescape(encodeURIComponent(t))) : decodeURIComponent(escape(atob(t)))); } catch (e) { setOut('b64-out', 'Error: ' + e.message); } }
+        function urlDo(enc) { try { const t = document.getElementById('url-in').value; setOut('url-out', enc ? encodeURIComponent(t) : decodeURIComponent(t)); } catch (e) { setOut('url-out', 'Invalid encoding'); } }
+        function htmlDo(enc) { const t = document.getElementById('html-in').value; if (enc) setOut('html-out', t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;')); else { const d = document.createElement('div'); d.innerHTML = t; setOut('html-out', d.textContent); } }
+        const MORSE_MAP = { A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..', 0: '-----', 1: '.----', 2: '..---', 3: '...--', 4: '....-', 5: '.....', 6: '-....', 7: '--...', 8: '---..', 9: '----.', '.': '.-.-.-', ',': '--..--', '?': '..--..', '/': "-..-.", ' ': '/' }, MORSE_INV = Object.fromEntries(Object.entries(MORSE_MAP).map(([k, v]) => [v, k]));
+        function morseDo(enc) { const t = document.getElementById('morse-in').value; if (enc) setOut('morse-out', t.toUpperCase().split('').map(c => MORSE_MAP[c] || c).join(' ')); else setOut('morse-out', t.trim().split(' / ').map(w => w.split(' ').map(c => MORSE_INV[c] || '?').join('')).join(' ')); }
+        function binDo(enc) { const t = document.getElementById('bin-in').value; if (enc) setOut('bin-out', t.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ')); else { try { setOut('bin-out', t.trim().split(/\s+/).map(b => String.fromCharCode(parseInt(b, 2))).join('')); } catch { setOut('bin-out', 'Error'); } } }
+        function hexDo(enc) { const t = document.getElementById('hex-in').value; if (enc) setOut('hex-out', Array.from(t).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')); else { try { setOut('hex-out', t.replace(/\s/g, '').match(/.{1,2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('')); } catch { setOut('hex-out', 'Error'); } } }
+        function xorDo() { const t = document.getElementById('xor-in').value, key = document.getElementById('xor-key').value || 'k'; const r = Array.from(t).map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join(''); setOut('xor-out', `Text: ${r}\nHex:  ${Array.from(r).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')}`); }
+        function beaufortDo() { const t = document.getElementById('beau-in').value, key = document.getElementById('beau-key').value.toUpperCase().replace(/[^A-Z]/g, '') || 'A'; let ki = 0, r = ''; for (const ch of t) { if (/[a-zA-Z]/.test(ch)) { const b = ch >= 'a' ? 97 : 65, k = key.charCodeAt(ki++ % key.length) - 65, x = ch.charCodeAt(0) - b; r += String.fromCharCode(((k - x + 26) % 26) + b); } else r += ch; } setOut('beau-out', r); }
+        const NATO = { A: 'Alpha', B: 'Bravo', C: 'Charlie', D: 'Delta', E: 'Echo', F: 'Foxtrot', G: 'Golf', H: 'Hotel', I: 'India', J: 'Juliet', K: 'Kilo', L: 'Lima', M: 'Mike', N: 'November', O: 'Oscar', P: 'Papa', Q: 'Quebec', R: 'Romeo', S: 'Sierra', T: 'Tango', U: 'Uniform', V: 'Victor', W: 'Whiskey', X: 'X-ray', Y: 'Yankee', Z: 'Zulu', '0': 'Zero', '1': 'One', '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five', '6': 'Six', '7': 'Seven', '8': 'Eight', '9': 'Nine' }, NATO_INV = Object.fromEntries(Object.entries(NATO).map(([k, v]) => [v.toUpperCase(), k]));
+        function natoDo(enc) { const t = document.getElementById('nato-in').value; if (enc) setOut('nato-out', t.toUpperCase().split('').map(c => NATO[c] || c).join(' ')); else setOut('nato-out', t.split(/\s+/).map(w => NATO_INV[w.toUpperCase()] || w).join('')); }
+        const ITA2_MAP = { ' ': '\x04', A: '\x03', B: '\x19', C: '\x0E', D: '\x09', E: '\x01', F: '\x0D', G: '\x1A', H: '\x14', I: '\x06', J: '\x0B', K: '\x0F', L: '\x12', M: '\x1C', N: '\x0C', O: '\x18', P: '\x16', Q: '\x17', R: '\x0A', S: '\x05', T: '\x10', U: '\x07', V: '\x1E', W: '\x13', X: '\x1B', Y: '\x15', Z: '\x11' };
+        function baudotDo(enc) { const t = document.getElementById('baudot-in').value; if (enc) { const b = t.toUpperCase().split('').map(c => { const code = ITA2_MAP[c]; return code ? code.charCodeAt(0).toString(2).padStart(5, '0') : null; }).filter(Boolean); setOut('baudot-out', b.join(' ')); } else { const inv = Object.fromEntries(Object.entries(ITA2_MAP).map(([k, v]) => [v.charCodeAt(0), k])); setOut('baudot-out', t.trim().split(/\s+/).map(b => inv[parseInt(b, 2)] || '?').join('')); } }
+        // HASH
+        async function sha(algo, msg) { const buf = await crypto.subtle.digest(algo, new TextEncoder().encode(msg)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+        function simpleMD5(s) { function safeAdd(x, y) { const lsw = (x & 0xFFFF) + (y & 0xFFFF), msw = Math.floor(x / 65536) + Math.floor(y / 65536) + (lsw >> 16); return Math.floor(msw / 65536) * 4294967296 + (msw & 0xFFFF) * 65536 + (lsw & 0xFFFF) } function bitRot(n, c) { return (n << c) | (n >>> (32 - c)) } function cmn(q, a, b, x, s, t) { return safeAdd(bitRot(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b) } function ff(a, b, c, d, x, s, t) { return cmn((b & c) | ((~b) & d), a, b, x, s, t) } function gg(a, b, c, d, x, s, t) { return cmn((b & d) | (c & (~d)), a, b, x, s, t) } function hh(a, b, c, d, x, s, t) { return cmn(b ^ c ^ d, a, b, x, s, t) } function ii(a, b, c, d, x, s, t) { return cmn(c ^ (b | (~d)), a, b, x, s, t) } function md5blks(s) { const m = []; let i; for (i = 0; i < s.length; i++)m[i >> 2] |= s.charCodeAt(i) << ((i % 4) * 8); m[i >> 2] |= 0x80 << ((i % 4) * 8); m[((s.length + 8) >> 6 << 4) + 14] = s.length * 8; return m } function md51(s) { const b = md5blks(s); let a = 1732584193, bv = -271733879, c = -1732584194, d = 271733878; for (let i = 0; i < b.length; i += 16) { const oa = a, ob = bv, oc = c, od = d; a = ff(a, bv, c, d, b[i], 7, -680876936); d = ff(d, a, bv, c, b[i + 1], 12, -389564586); c = ff(c, d, a, bv, b[i + 2], 17, 606105819); bv = ff(bv, c, d, a, b[i + 3], 22, -1044525330); a = ff(a, bv, c, d, b[i + 4], 7, -176418897); d = ff(d, a, bv, c, b[i + 5], 12, 1200080426); c = ff(c, d, a, bv, b[i + 6], 17, -1473231341); bv = ff(bv, c, d, a, b[i + 7], 22, -45705983); a = ff(a, bv, c, d, b[i + 8], 7, 1770035416); d = ff(d, a, bv, c, b[i + 9], 12, -1958414417); c = ff(c, d, a, bv, b[i + 10], 17, -42063); bv = ff(bv, c, d, a, b[i + 11], 22, -1990404162); a = ff(a, bv, c, d, b[i + 12], 7, 1804603682); d = ff(d, a, bv, c, b[i + 13], 12, -40341101); c = ff(c, d, a, bv, b[i + 14], 17, -1502002290); bv = ff(bv, c, d, a, b[i + 15], 22, 1236535329); a = gg(a, bv, c, d, b[i + 1], 5, -165796510); d = gg(d, a, bv, c, b[i + 6], 9, -1069501632); c = gg(c, d, a, bv, b[i + 11], 14, 643717713); bv = gg(bv, c, d, a, b[i], 20, -373897302); a = gg(a, bv, c, d, b[i + 5], 5, -701558691); d = gg(d, a, bv, c, b[i + 10], 9, 38016083); c = gg(c, d, a, bv, b[i + 15], 14, -660478335); bv = gg(bv, c, d, a, b[i + 4], 20, -405537848); a = gg(a, bv, c, d, b[i + 9], 5, 568446438); d = gg(d, a, bv, c, b[i + 14], 9, -1019803690); c = gg(c, d, a, bv, b[i + 3], 14, -187363961); bv = gg(bv, c, d, a, b[i + 8], 20, 1163531501); a = gg(a, bv, c, d, b[i + 13], 5, -1444681467); d = gg(d, a, bv, c, b[i + 2], 9, -51403784); c = gg(c, d, a, bv, b[i + 7], 14, 1735328473); bv = gg(bv, c, d, a, b[i + 12], 20, -1926607734); a = hh(a, bv, c, d, b[i + 5], 4, -378558); d = hh(d, a, bv, c, b[i + 8], 11, -2022574463); c = hh(c, d, a, bv, b[i + 11], 16, 1839030562); bv = hh(bv, c, d, a, b[i + 14], 23, -35309556); a = hh(a, bv, c, d, b[i + 1], 4, -1530992060); d = hh(d, a, bv, c, b[i + 4], 11, 1272893353); c = hh(c, d, a, bv, b[i + 7], 16, -155497632); bv = hh(bv, c, d, a, b[i + 10], 23, -1094730640); a = hh(a, bv, c, d, b[i + 13], 4, 681279174); d = hh(d, a, bv, c, b[i], 11, -358537222); c = hh(c, d, a, bv, b[i + 3], 16, -722521979); bv = hh(bv, c, d, a, b[i + 6], 23, 76029189); a = hh(a, bv, c, d, b[i + 9], 4, -640364487); d = hh(d, a, bv, c, b[i + 12], 11, -421815835); c = hh(c, d, a, bv, b[i + 15], 16, 530742520); bv = hh(bv, c, d, a, b[i + 2], 23, -995338651); a = ii(a, bv, c, d, b[i], 6, -198630844); d = ii(d, a, bv, c, b[i + 7], 10, 1126891415); c = ii(c, d, a, bv, b[i + 14], 15, -1416354905); bv = ii(bv, c, d, a, b[i + 5], 21, -57434055); a = ii(a, bv, c, d, b[i + 12], 6, 1700485571); d = ii(d, a, bv, c, b[i + 3], 10, -1894986606); c = ii(c, d, a, bv, b[i + 10], 15, -1051523); bv = ii(bv, c, d, a, b[i + 1], 21, -2054922799); a = ii(a, bv, c, d, b[i + 8], 6, 1873313359); d = ii(d, a, bv, c, b[i + 15], 10, -30611744); c = ii(c, d, a, bv, b[i + 6], 15, -1560198380); bv = ii(bv, c, d, a, b[i + 13], 21, 1309151649); a = ii(a, bv, c, d, b[i + 4], 6, -145523070); d = ii(d, a, bv, c, b[i + 11], 10, -1120210379); c = ii(c, d, a, bv, b[i + 2], 15, 718787259); bv = ii(bv, c, d, a, b[i + 9], 21, -343485551); a = safeAdd(a, oa); bv = safeAdd(bv, ob); c = safeAdd(c, oc); d = safeAdd(d, od); } return [a, bv, c, d]; } function rhex(n) { let s = ''; for (let j = 0; j < 4; j++)s += ('0' + ((n >> (j * 8 + 4)) & 0xF).toString(16)) + ('0' + ((n >> (j * 8)) & 0xF).toString(16)); return s; } const r = md51(s); return rhex(r[0]) + rhex(r[1]) + rhex(r[2]) + rhex(r[3]); }
+        async function generateHashes() { const text = document.getElementById('hash-in').value, c = document.getElementById('hash-results'); if (!text) { c.innerHTML = '<div style="color:var(--text-muted);font-size:.82rem;padding:.5rem 0">Type above to see hashes…</div>'; return; } c.innerHTML = '<div style="color:var(--text-muted);font-size:.8rem;padding:.3rem 0">Computing…</div>'; const algos = [{ name: 'MD5', fn: async () => simpleMD5(text) }, { name: 'SHA-1', fn: async () => sha('SHA-1', text) }, { name: 'SHA-256', fn: async () => sha('SHA-256', text) }, { name: 'SHA-384', fn: async () => sha('SHA-384', text) }, { name: 'SHA-512', fn: async () => sha('SHA-512', text) }]; const results = await Promise.all(algos.map(a => a.fn().then(h => ({ name: a.name, hash: h })))); c.innerHTML = results.map(r => `<div class="hash-item"><span class="hash-algo">${r.name}</span><span class="hash-val">${r.hash}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${r.hash}')" style="flex-shrink:0">copy</button></div>`).join(''); }
+        async function generateHMAC() { const msg = document.getElementById('hmac-msg').value, key = document.getElementById('hmac-key').value, algoName = document.getElementById('hmac-algo').value; try { const enc = new TextEncoder(), kd = await crypto.subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: algoName }, false, ['sign']); const sig = await crypto.subtle.sign('HMAC', kd, enc.encode(msg)); setOut('hmac-out', Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('')); } catch (e) { setOut('hmac-out', 'Error: ' + e.message); } }
+        // UNIT CONVERTER
+        const UNITS = { length: { units: ['meter', 'kilometer', 'centimeter', 'millimeter', 'micrometer', 'nanometer', 'mile', 'yard', 'foot', 'inch', 'nautical mile', 'light-year'], toBase: [1, 1000, .01, .001, 1e-6, 1e-9, 1609.344, .9144, .3048, .0254, 1852, 9.461e15] }, weight: { units: ['kilogram', 'gram', 'milligram', 'pound', 'ounce', 'ton (metric)', 'ton (US)', 'stone', 'carat'], toBase: [1, .001, 1e-6, .453592, .0283495, 1000, 907.185, 6.35029, .0002] }, temperature: { units: ['Celsius', 'Fahrenheit', 'Kelvin', 'Rankine'], toBase: null }, area: { units: ['sq meter', 'sq kilometer', 'sq foot', 'sq inch', 'sq yard', 'sq mile', 'hectare', 'acre'], toBase: [1, 1e6, .0929, .000645, .8361, 2.59e6, 10000, 4046.86] }, volume: { units: ['liter', 'milliliter', 'cubic meter', 'cubic foot', 'cubic inch', 'gallon (US)', 'quart (US)', 'pint (US)', 'cup', 'tablespoon', 'teaspoon'], toBase: [1, .001, 1000, 28.3168, .0163871, 3.78541, .946353, .473176, .236588, .0147868, .00492892] }, speed: { units: ['m/s', 'km/h', 'mph', 'knot', 'ft/s', 'Mach'], toBase: [1, .277778, .44704, .514444, .3048, 340.3] }, data: { units: ['bit', 'byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte', 'petabyte', 'kibibyte', 'mebibyte', 'gibibyte'], toBase: [1, 8, 8000, 8e6, 8e9, 8e12, 8e15, 8192, 8388608, 8589934592] }, time: { units: ['second', 'millisecond', 'microsecond', 'minute', 'hour', 'day', 'week', 'month (avg)', 'year'], toBase: [1, .001, 1e-6, 60, 3600, 86400, 604800, 2628000, 31536000] }, energy: { units: ['joule', 'kilojoule', 'calorie', 'kilocalorie', 'watt-hour', 'kilowatt-hour', 'electronvolt', 'BTU', 'foot-pound'], toBase: [1, 1000, 4.184, 4184, 3600, 3600000, 1.602e-19, 1055.06, 1.35582] }, pressure: { units: ['pascal', 'kilopascal', 'bar', 'atmosphere', 'psi', 'torr', 'mmHg'], toBase: [1, 1000, 100000, 101325, 6894.76, 133.322, 133.322] }, angle: { units: ['degree', 'radian', 'gradian', 'arcminute', 'arcsecond', 'turn'], toBase: [1, 57.2958, .9, 1 / 60, 1 / 3600, 360] } };
+        let currentUnitCat = 'length';
+        function setUnitCat(cat, el) { currentUnitCat = cat; document.querySelectorAll('#panel-convert .cat-pill').forEach(p => p.classList.remove('active')); el.classList.add('active'); const d = UNITS[cat];['unit-from', 'unit-to'].forEach(id => { document.getElementById(id).innerHTML = d.units.map((u, i) => `<option value="${i}">${u}</option>`).join(''); }); document.getElementById('unit-to').value = Math.min(1, d.units.length - 1); doUnitConvert(); }
+        function tempConvert(v, fi, ti) { let c; if (fi === 0) c = v; else if (fi === 1) c = (v - 32) * 5 / 9; else if (fi === 2) c = v - 273.15; else c = (v - 491.67) * 5 / 9; if (ti === 0) return c; if (ti === 1) return c * 9 / 5 + 32; if (ti === 2) return c + 273.15; return (c + 273.15) * 9 / 5; }
+        function doUnitConvert() { const val = parseFloat(document.getElementById('unit-val').value) || 0, fi = parseInt(document.getElementById('unit-from').value), ti = parseInt(document.getElementById('unit-to').value), d = UNITS[currentUnitCat]; let res = currentUnitCat === 'temperature' ? tempConvert(val, fi, ti) : val * d.toBase[fi] / d.toBase[ti]; const fmt = Math.abs(res) < .001 || Math.abs(res) > 1e9 ? res.toExponential(6) : parseFloat(res.toFixed(8)); document.getElementById('unit-result').value = fmt; document.getElementById('unit-formula').textContent = `${val} ${d.units[fi]}  =  ${fmt} ${d.units[ti]}`; const tbl = document.getElementById('unit-table'); if (currentUnitCat === 'temperature') tbl.innerHTML = [0, 1, 2, 3].map(i => `<span style="color:var(--accent)">${d.units[i]}:</span> ${parseFloat(tempConvert(val, fi, i).toFixed(4))}`).join('<br>'); else tbl.innerHTML = d.units.map((u, i) => { const r = val * d.toBase[fi] / d.toBase[i]; return `<span style="color:var(--accent)">${u}:</span> ${Math.abs(r) < .0001 || Math.abs(r) > 1e9 ? r.toExponential(4) : parseFloat(r.toFixed(6))}`; }).join('<br>'); }
+        function swapUnits() { const f = document.getElementById('unit-from'), t = document.getElementById('unit-to');[f.value, t.value] = [t.value, f.value]; doUnitConvert(); }
+        // BASE
+        function doBaseConvert() { const input = document.getElementById('base-in').value.trim(), fb = parseInt(document.getElementById('base-from').value); if (!input) { document.getElementById('base-results').innerHTML = ''; return; } try { const dec = parseInt(input, fb); if (isNaN(dec)) { document.getElementById('base-results').innerHTML = '<div style="color:var(--danger)">Invalid number</div>'; return; } document.getElementById('base-results').innerHTML = [{ label: 'Binary (2)', base: 2 }, { label: 'Octal (8)', base: 8 }, { label: 'Decimal (10)', base: 10 }, { label: 'Hex (16)', base: 16 }, { label: 'Base 32', base: 32 }, { label: 'Base 36', base: 36 }].map(b => `<div class="base-item"><div class="base-label">${b.label}</div><div class="base-val">${dec.toString(b.base).toUpperCase()}</div></div>`).join(''); } catch (e) { } }
+        function doArbBase() { const input = document.getElementById('arb-in').value.trim(), from = parseInt(document.getElementById('arb-from').value), to = parseInt(document.getElementById('arb-to').value); if (!input || isNaN(from) || isNaN(to)) return; try { const dec = parseInt(input, from); setOut('arb-out', isNaN(dec) ? 'Invalid input' : dec.toString(to).toUpperCase()); } catch (e) { setOut('arb-out', 'Error'); } }
+        // COLOR
+        function hexToRgb(h) { h = h.replace(/^#/, ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }; }
+        function rgbToHsl(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, l = (max + min) / 2; if (max === min) { h = s = 0; } else { const d = max - min; s = l > .5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; }h /= 6; } return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) }; }
+        function rgbToHsv(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; let h; if (d === 0) h = 0; else { switch (max) { case r: h = (g - b) / d % 6; break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; }h = Math.round(h * 60); if (h < 0) h += 360; } return { h, s: Math.round((max === 0 ? 0 : d / max) * 100), v: Math.round(max * 100) }; }
+        function hslToHex(h, s, l) { s /= 100; l /= 100; const a = s * Math.min(l, 1 - l); const f = n => { const k = (n + h / 30) % 12; return Math.round(255 * (l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1))).toString(16).padStart(2, '0') }; return `#${f(0)}${f(8)}${f(4)}`; }
+        function onColorPick(hex) { document.getElementById('color-hex-in').value = hex; updateColorConversions(hex); }
+        function onHexType(hex) { if (/^#[0-9a-fA-F]{6}$/.test(hex)) { document.getElementById('color-picker').value = hex; updateColorConversions(hex); } }
+        function updateColorConversions(hex) { document.getElementById('color-preview').style.background = hex; const { r, g, b } = hexToRgb(hex); const { h, s, l } = rgbToHsl(r, g, b); const hsv = rgbToHsv(r, g, b); const k = 1 - Math.max(r, g, b) / 255, cc = (1 - r / 255 - k) / (1 - k) || 0, m = (1 - g / 255 - k) / (1 - k) || 0, y = (1 - b / 255 - k) / (1 - k) || 0; document.getElementById('color-conversions').innerHTML = [['HEX', hex.toUpperCase()], ['RGB', `rgb(${r}, ${g}, ${b})`], ['HSL', `hsl(${h}, ${s}%, ${l}%)`], ['HSV', `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`], ['CMYK', `cmyk(${Math.round(cc * 100)}%, ${Math.round(m * 100)}%, ${Math.round(y * 100)}%, ${Math.round(k * 100)}%)`], ['Decimal', `${r << 16 | g << 8 | b}`], ['Luminance', `${(0.2126 * r / 255 + 0.7152 * g / 255 + 0.0722 * b / 255).toFixed(4)}`], ['Alpha 50%', `rgba(${r}, ${g}, ${b}, 0.5)`]].map(([k, v]) => `<div class="color-conv-item"><span class="color-conv-key">${k}</span><span class="color-conv-val" onclick="navigator.clipboard.writeText('${v}')" title="Copy">${v}</span></div>`).join(''); }
+        function genPalette() { const hex = document.getElementById('pal-color').value, type = document.getElementById('pal-type').value, { r, g, b } = hexToRgb(hex), { h, s, l } = rgbToHsl(r, g, b); let cols = []; switch (type) { case 'complementary': cols = [h, (h + 180) % 360].map(hue => hslToHex(hue, s, l)); break; case 'analogous': cols = [-30, 0, 30].map(d => hslToHex((h + d + 360) % 360, s, l)); break; case 'triadic': cols = [0, 120, 240].map(d => hslToHex((h + d) % 360, s, l)); break; case 'split': cols = [0, 150, 210].map(d => hslToHex((h + d) % 360, s, l)); break; case 'tetradic': cols = [0, 90, 180, 270].map(d => hslToHex((h + d) % 360, s, l)); break; case 'tints': cols = [80, 65, 50, 35, 20].map(lt => hslToHex(h, s, lt)); break; case 'shades': cols = [20, 35, 50, 65, 80].map(lt => hslToHex(h, s, lt)); break; }document.getElementById('palette-swatches').innerHTML = cols.map(c => `<div class="palette-swatch" style="background:${c}" onclick="navigator.clipboard.writeText('${c}')"><span class="swatch-label">${c.toUpperCase()}</span></div>`).join(''); }
+        function checkContrast() { const fg = document.getElementById('fg-color').value, bg = document.getElementById('bg-color').value, prev = document.getElementById('contrast-preview'); prev.style.background = bg; prev.style.color = fg; const fR = hexToRgb(fg), bR = hexToRgb(bg); function lum(c) { const r = c.r / 255, g = c.g / 255, b = c.b / 255; return .2126 * (r < .03928 ? r / 12.92 : Math.pow((r + .055) / 1.055, 2.4)) + .7152 * (g < .03928 ? g / 12.92 : Math.pow((g + .055) / 1.055, 2.4)) + .0722 * (b < .03928 ? b / 12.92 : Math.pow((b + .055) / 1.055, 2.4)); } const L1 = Math.max(lum(fR), lum(bR)), L2 = Math.min(lum(fR), lum(bR)), ratio = (L1 + .05) / (L2 + .05); const pass = c => `<span style="color:${c ? 'var(--accent3)' : 'var(--danger)'}">${c ? '✓ Pass' : '✗ Fail'}</span>`; document.getElementById('contrast-result').innerHTML = `<div><span style="color:var(--text-muted)">Ratio:</span> <strong style="color:${ratio >= 4.5 ? 'var(--accent3)' : ratio >= 3 ? 'var(--warn)' : 'var(--danger)'}">${ratio.toFixed(2)}:1</strong></div><div><span style="color:var(--text-muted)">AA Normal:</span> ${pass(ratio >= 4.5)}</div><div><span style="color:var(--text-muted)">AA Large:</span> ${pass(ratio >= 3)}</div><div><span style="color:var(--text-muted)">AAA Normal:</span> ${pass(ratio >= 7)}</div><div><span style="color:var(--text-muted)">AAA Large:</span> ${pass(ratio >= 4.5)}</div>`; }
+        const CSS_COLORS = { aliceblue: '#f0f8ff', antiquewhite: '#faebd7', aqua: '#00ffff', aquamarine: '#7fffd4', azure: '#f0ffff', beige: '#f5f5dc', bisque: '#ffe4c4', black: '#000000', blanchedalmond: '#ffebcd', blue: '#0000ff', blueviolet: '#8a2be2', brown: '#a52a2a', burlywood: '#deb887', cadetblue: '#5f9ea0', chartreuse: '#7fff00', chocolate: '#d2691e', coral: '#ff7f50', cornflowerblue: '#6495ed', crimson: '#dc143c', cyan: '#00ffff', darkblue: '#00008b', darkcyan: '#008b8b', darkgoldenrod: '#b8860b', darkgray: '#a9a9a9', darkgreen: '#006400', darkorange: '#ff8c00', darkorchid: '#9932cc', darkred: '#8b0000', darksalmon: '#e9967a', darkviolet: '#9400d3', deeppink: '#ff1493', deepskyblue: '#00bfff', dodgerblue: '#1e90ff', firebrick: '#b22222', forestgreen: '#228b22', fuchsia: '#ff00ff', gold: '#ffd700', goldenrod: '#daa520', gray: '#808080', green: '#008000', greenyellow: '#adff2f', hotpink: '#ff69b4', indianred: '#cd5c5c', indigo: '#4b0082', khaki: '#f0e68c', lavender: '#e6e6fa', lawngreen: '#7cfc00', lightblue: '#add8e6', lightcoral: '#f08080', lightcyan: '#e0ffff', lightgray: '#d3d3d3', lightgreen: '#90ee90', lightpink: '#ffb6c1', lightsalmon: '#ffa07a', lightseagreen: '#20b2aa', lightskyblue: '#87cefa', lightyellow: '#ffffe0', lime: '#00ff00', limegreen: '#32cd32', magenta: '#ff00ff', maroon: '#800000', mediumaquamarine: '#66cdaa', mediumblue: '#0000cd', mediumorchid: '#ba55d3', mediumpurple: '#9370db', mediumseagreen: '#3cb371', mediumturquoise: '#48d1cc', mediumvioletred: '#c71585', midnightblue: '#191970', navy: '#000080', olive: '#808000', olivedrab: '#6b8e23', orange: '#ffa500', orangered: '#ff4500', orchid: '#da70d6', palegreen: '#98fb98', paleturquoise: '#afeeee', palevioletred: '#db7093', peachpuff: '#ffdab9', peru: '#cd853f', pink: '#ffc0cb', plum: '#dda0dd', powderblue: '#b0e0e6', purple: '#800080', red: '#ff0000', rosybrown: '#bc8f8f', royalblue: '#4169e1', saddlebrown: '#8b4513', salmon: '#fa8072', sandybrown: '#f4a460', seagreen: '#2e8b57', sienna: '#a0522d', silver: '#c0c0c0', skyblue: '#87ceeb', slateblue: '#6a5acd', slategray: '#708090', springgreen: '#00ff7f', steelblue: '#4682b4', tan: '#d2b48c', teal: '#008080', thistle: '#d8bfd8', tomato: '#ff6347', turquoise: '#40e0d0', violet: '#ee82ee', wheat: '#f5deb3', white: '#ffffff', whitesmoke: '#f5f5f5', yellow: '#ffff00', yellowgreen: '#9acd32' };
+        function colorDistance(r1, g1, b1, r2, g2, b2) { return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2); }
+        function findColorName(hex) { document.getElementById('name-hex').value = hex; document.getElementById('name-preview').style.background = hex; const { r, g, b } = hexToRgb(hex); let closest = null, closestDist = Infinity; for (const [name, cHex] of Object.entries(CSS_COLORS)) { const { r: r2, g: g2, b: b2 } = hexToRgb(cHex); const dist = colorDistance(r, g, b, r2, g2, b2); if (dist < closestDist) { closestDist = dist; closest = name; } } document.getElementById('color-name').textContent = closest ? `${closest} (${CSS_COLORS[closest].toUpperCase()})` : 'No close match'; }
+    </script>
+</body>
+
+</html>

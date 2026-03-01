@@ -1,261 +1,1864 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cypher | Decode the Unseen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class', // Changed to class for easier manual toggling if needed
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        cypherBlue: '#007AFF',
-                        cypherPurple: '#5856D6',
-                        cypherPink: '#FF2D55',
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'bounce-subtle': 'bounce-subtle 2s infinite',
-                    },
-                    keyframes: {
-                        'bounce-subtle': {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-5px)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .dark .glass {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 122, 255, 0.2); border-radius: 10px; }
-        
-        /* Easter Egg: Glitch Effect */
-        .glitch-mode { animation: glitch 0.2s infinite; }
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-    </style>
-</head>
-<body class="bg-[#F2F2F7] text-[#1C1C1E] dark:bg-[#000000] dark:text-[#F2F2F7] min-h-screen font-sans antialiased transition-colors duration-700">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoTools — Encode · Decode · Convert</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a25;
+    --border: #2a2a3a;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cypherBlue opacity-10 blur-[120px] animate-pulse-slow"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-cypherPurple opacity-10 blur-[120px] animate-pulse-slow"></div>
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 2rem;
+    height: 64px;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--muted); }
+  nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+  nav button {
+    background: none; border: none;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  nav button:hover { color: var(--text); background: var(--surface2); }
+  nav button.active { color: var(--accent); background: rgba(0,229,255,0.08); }
+
+  /* Main layout */
+  main { position: relative; z-index: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+  /* Section panels */
+  .panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Tool Grid */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media(max-width:900px){ .tool-grid { grid-template-columns: 1fr; } }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,229,255,0.3); }
+  .card-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .card-title .tag {
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  /* Cipher selector */
+  .cipher-select-row {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
+  }
+  select, input[type=text], input[type=number], textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,229,255,0.08);
+  }
+  select { cursor: pointer; }
+
+  textarea {
+    width: 100%; height: 100px; resize: vertical;
+    line-height: 1.6;
+  }
+
+  label { font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 0.3rem; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: #33eaff; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.78rem; }
+
+  .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+  /* Output box */
+  .output {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    min-height: 60px;
+    word-break: break-all;
+    line-height: 1.7;
+    color: var(--accent);
+    margin-top: 0.75rem;
+    position: relative;
+    white-space: pre-wrap;
+  }
+  .copy-btn {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 6px;
+    padding: 0.2rem 0.5rem; font-size: 0.7rem; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Section heading */
+  .section-heading {
+    font-size: 2rem; font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .section-sub {
+    color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;
+  }
+
+  /* Category pills */
+  .cat-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .cat-pill {
+    padding: 0.35rem 0.9rem; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cat-pill:hover, .cat-pill.active {
+    background: rgba(0,229,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Converter specific */
+  .converter-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: end; }
+  @media(max-width:600px){ .converter-grid { grid-template-columns: 1fr; } }
+  .swap-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 50%;
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1.2rem;
+    transition: all 0.2s; flex-shrink: 0; margin-bottom: 0;
+  }
+  .swap-btn:hover { color: var(--accent); border-color: var(--accent); transform: rotate(180deg); }
+
+  /* Hash display */
+  .hash-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+  .hash-item {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 0.75rem;
+    display: flex; align-items: flex-start; gap: 0.75rem;
+  }
+  .hash-algo {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent2); min-width: 70px;
+    padding-top: 0.1rem;
+  }
+  .hash-val {
+    font-family: 'Space Mono', monospace; font-size: 0.78rem;
+    word-break: break-all; color: var(--text); flex: 1; line-height: 1.6;
+  }
+
+  /* Morse code */
+  .morse-ref {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(60px,1fr));
+    gap: 0.25rem; margin-top: 1rem;
+    max-height: 150px; overflow-y: auto;
+  }
+  .morse-cell {
+    background: var(--surface2); border-radius: 6px;
+    padding: 0.25rem 0.4rem; text-align: center; font-size: 0.72rem;
+  }
+  .morse-cell span:first-child { font-weight: 700; color: var(--accent); }
+
+  /* Color Tools */
+  .color-preview {
+    width: 100%; height: 80px; border-radius: 10px; margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+
+  /* Number base */
+  .base-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  @media(max-width:500px){ .base-grid { grid-template-columns: 1fr; } }
+
+  /* Tabs within card */
+  .mini-tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; }
+  .mini-tab {
+    padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+    border: 1px solid transparent; cursor: pointer; background: none;
+    color: var(--muted); font-family: 'Syne', sans-serif; transition: all 0.2s;
+  }
+  .mini-tab.active { background: rgba(0,229,255,0.1); border-color: rgba(0,229,255,0.3); color: var(--accent); }
+
+  /* Key input */
+  .key-input-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
+  .key-input-row input { flex: 1; }
+  .key-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent3); white-space: nowrap;
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 5px; padding: 0.4rem 0.6rem;
+  }
+
+  /* Status badge */
+  .badge {
+    display: inline-block; padding: 0.15rem 0.5rem;
+    border-radius: 4px; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .badge-classic { background: rgba(124,58,237,0.15); color: var(--accent2); border: 1px solid rgba(124,58,237,0.3); }
+  .badge-modern { background: rgba(0,229,255,0.1); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
+  .badge-hash { background: rgba(245,158,11,0.1); color: var(--accent3); border: 1px solid rgba(245,158,11,0.2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+    background: var(--success); color: #000;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+    padding: 0.6rem 1.2rem; border-radius: 8px;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  input[type=color] {
+    width: 48px; height: 38px; padding: 2px;
+    border-radius: 8px; cursor: pointer; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="toast">Copied!</div>
+
+<header>
+  <div class="logo">CRYPTO<span>TOOLS</span></div>
+  <nav>
+    <button class="active" onclick="showPanel('encode')">Encode/Decode</button>
+    <button onclick="showPanel('hash')">Hash</button>
+    <button onclick="showPanel('convert')">Unit Converter</button>
+    <button onclick="showPanel('base')">Base Convert</button>
+    <button onclick="showPanel('color')">Color Tools</button>
+    <button onclick="showPanel('misc')">Misc Tools</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ===== ENCODE / DECODE ===== -->
+<div class="panel active" id="panel-encode">
+  <h2 class="section-heading">Encode &amp; Decode</h2>
+  <p class="section-sub">Classical ciphers, modern encodings, and everything in between.</p>
+
+  <div class="cat-pills">
+    <div class="cat-pill active" onclick="filterCat('all',this)">All</div>
+    <div class="cat-pill" onclick="filterCat('classic',this)">Classical</div>
+    <div class="cat-pill" onclick="filterCat('modern',this)">Modern Encodings</div>
+    <div class="cat-pill" onclick="filterCat('substitution',this)">Substitution</div>
+    <div class="cat-pill" onclick="filterCat('transposition',this)">Transposition</div>
+    <div class="cat-pill" onclick="filterCat('code',this)">Codes</div>
+  </div>
+
+  <div class="tool-grid" id="encode-grid">
+
+    <!-- Caesar -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Caesar Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="caesar-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Shift</span>
+        <input type="number" id="caesar-key" value="13" min="1" max="25" style="width:80px">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="caesarDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="caesarDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('caesar-in','caesar-out')">Clear</button>
+      </div>
+      <div class="output" id="caesar-out"><button class="copy-btn" onclick="copyOut('caesar-out')">copy</button></div>
     </div>
 
-    <nav class="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto w-full">
-        <div class="flex items-center space-x-3 group cursor-pointer" onclick="eggTrigger()">
-            <div id="navMascot" class="w-10 h-10 rounded-full border-[1.5px] border-black/10 dark:border-white/10 flex items-center justify-center font-semibold text-lg transition-all group-hover:scale-110 group-hover:border-cypherBlue">
-                ツ
-            </div>
-            <span class="text-lg font-semibold tracking-tight">Cypher Lab</span>
+    <!-- ROT13 -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">ROT13 <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="rot13-in" placeholder="ROT13 is its own inverse..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="doRot13()">Apply ROT13</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('rot13-in','rot13-out')">Clear</button>
+      </div>
+      <div class="output" id="rot13-out"><button class="copy-btn" onclick="copyOut('rot13-out')">copy</button></div>
+    </div>
+
+    <!-- Vigenère -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Vigenère Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="vig-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Key</span>
+        <input type="text" id="vig-key" placeholder="keyword" value="SECRET">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="vigenereDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="vigenereDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('vig-in','vig-out')">Clear</button>
+      </div>
+      <div class="output" id="vig-out"><button class="copy-btn" onclick="copyOut('vig-out')">copy</button></div>
+    </div>
+
+    <!-- Atbash -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Atbash Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text (A↔Z, B↔Y, ...)</label>
+      <textarea id="atbash-in" placeholder="Enter text..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="doAtbash()">Apply Atbash</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('atbash-in','atbash-out')">Clear</button>
+      </div>
+      <div class="output" id="atbash-out"><button class="copy-btn" onclick="copyOut('atbash-out')">copy</button></div>
+    </div>
+
+    <!-- Affine -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Affine Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="affine-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">a</span>
+        <input type="number" id="affine-a" value="5" min="1" max="25" style="width:70px">
+        <span class="key-label">b</span>
+        <input type="number" id="affine-b" value="8" min="0" max="25" style="width:70px">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="affineDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="affineDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('affine-in','affine-out')">Clear</button>
+      </div>
+      <div class="output" id="affine-out"><button class="copy-btn" onclick="copyOut('affine-out')">copy</button></div>
+    </div>
+
+    <!-- Rail Fence -->
+    <div class="card" data-cat="classic transposition">
+      <div class="card-title">Rail Fence Cipher <span class="badge badge-classic">Transposition</span></div>
+      <label>Input Text</label>
+      <textarea id="rail-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Rails</span>
+        <input type="number" id="rail-key" value="3" min="2" max="10" style="width:70px">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="railDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="railDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('rail-in','rail-out')">Clear</button>
+      </div>
+      <div class="output" id="rail-out"><button class="copy-btn" onclick="copyOut('rail-out')">copy</button></div>
+    </div>
+
+    <!-- Columnar Transposition -->
+    <div class="card" data-cat="classic transposition">
+      <div class="card-title">Columnar Transposition <span class="badge badge-classic">Transposition</span></div>
+      <label>Input Text</label>
+      <textarea id="col-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Key</span>
+        <input type="text" id="col-key" value="ZEBRA" placeholder="keyword">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="columnarDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="columnarDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('col-in','col-out')">Clear</button>
+      </div>
+      <div class="output" id="col-out"><button class="copy-btn" onclick="copyOut('col-out')">copy</button></div>
+    </div>
+
+    <!-- Bacon's Cipher -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Bacon's Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="bacon-in" placeholder="Enter text..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="baconDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="baconDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('bacon-in','bacon-out')">Clear</button>
+      </div>
+      <div class="output" id="bacon-out"><button class="copy-btn" onclick="copyOut('bacon-out')">copy</button></div>
+    </div>
+
+    <!-- Polybius Square -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Polybius Square <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="polybius-in" placeholder="Enter text..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="polybiusDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="polybiusDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('polybius-in','polybius-out')">Clear</button>
+      </div>
+      <div class="output" id="polybius-out"><button class="copy-btn" onclick="copyOut('polybius-out')">copy</button></div>
+    </div>
+
+    <!-- Playfair -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Playfair Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="play-in" placeholder="Enter text (I/J treated as same)..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Key</span>
+        <input type="text" id="play-key" value="MONARCHY" placeholder="keyword">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="playfairDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="playfairDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('play-in','play-out')">Clear</button>
+      </div>
+      <div class="output" id="play-out"><button class="copy-btn" onclick="copyOut('play-out')">copy</button></div>
+    </div>
+
+    <!-- Base64 -->
+    <div class="card" data-cat="modern">
+      <div class="card-title">Base64 <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="b64-in" placeholder="Enter text or Base64..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="b64Do(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="b64Do(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('b64-in','b64-out')">Clear</button>
+      </div>
+      <div class="output" id="b64-out"><button class="copy-btn" onclick="copyOut('b64-out')">copy</button></div>
+    </div>
+
+    <!-- URL Encoding -->
+    <div class="card" data-cat="modern">
+      <div class="card-title">URL Encoding <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="url-in" placeholder="Enter text or URL-encoded string..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="urlDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="urlDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('url-in','url-out')">Clear</button>
+      </div>
+      <div class="output" id="url-out"><button class="copy-btn" onclick="copyOut('url-out')">copy</button></div>
+    </div>
+
+    <!-- HTML Entities -->
+    <div class="card" data-cat="modern">
+      <div class="card-title">HTML Entities <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="html-in" placeholder="Enter text or HTML entities..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="htmlDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="htmlDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('html-in','html-out')">Clear</button>
+      </div>
+      <div class="output" id="html-out"><button class="copy-btn" onclick="copyOut('html-out')">copy</button></div>
+    </div>
+
+    <!-- Morse Code -->
+    <div class="card" data-cat="code">
+      <div class="card-title">Morse Code <span class="badge badge-classic">Code</span></div>
+      <label>Input Text</label>
+      <textarea id="morse-in" placeholder="Enter text or morse (use space between letters, / between words)"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="morseDo(true)">To Morse</button>
+        <button class="btn btn-secondary btn-sm" onclick="morseDo(false)">From Morse</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('morse-in','morse-out')">Clear</button>
+      </div>
+      <div class="output" id="morse-out"><button class="copy-btn" onclick="copyOut('morse-out')">copy</button></div>
+    </div>
+
+    <!-- Binary -->
+    <div class="card" data-cat="modern code">
+      <div class="card-title">Binary Text <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="bin-in" placeholder="Enter text or binary (space-separated bytes)..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="binDo(true)">To Binary</button>
+        <button class="btn btn-secondary btn-sm" onclick="binDo(false)">From Binary</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('bin-in','bin-out')">Clear</button>
+      </div>
+      <div class="output" id="bin-out"><button class="copy-btn" onclick="copyOut('bin-out')">copy</button></div>
+    </div>
+
+    <!-- Hex -->
+    <div class="card" data-cat="modern code">
+      <div class="card-title">Hex Encoding <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="hex-in" placeholder="Enter text or hex string..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="hexDo(true)">To Hex</button>
+        <button class="btn btn-secondary btn-sm" onclick="hexDo(false)">From Hex</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('hex-in','hex-out')">Clear</button>
+      </div>
+      <div class="output" id="hex-out"><button class="copy-btn" onclick="copyOut('hex-out')">copy</button></div>
+    </div>
+
+    <!-- XOR -->
+    <div class="card" data-cat="modern">
+      <div class="card-title">XOR Cipher <span class="badge badge-modern">Symmetric</span></div>
+      <label>Input Text</label>
+      <textarea id="xor-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Key</span>
+        <input type="text" id="xor-key" value="key123" placeholder="XOR key">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="xorDo()">Apply XOR</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('xor-in','xor-out')">Clear</button>
+      </div>
+      <div class="output" id="xor-out"><button class="copy-btn" onclick="copyOut('xor-out')">copy</button></div>
+    </div>
+
+    <!-- Beaufort -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">Beaufort Cipher <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text</label>
+      <textarea id="beau-in" placeholder="Enter text..."></textarea>
+      <div class="key-input-row">
+        <span class="key-label">Key</span>
+        <input type="text" id="beau-key" value="BEAUFORT" placeholder="keyword">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="beaufortDo()">Apply (self-inverse)</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('beau-in','beau-out')">Clear</button>
+      </div>
+      <div class="output" id="beau-out"><button class="copy-btn" onclick="copyOut('beau-out')">copy</button></div>
+    </div>
+
+    <!-- NATO Alphabet -->
+    <div class="card" data-cat="code">
+      <div class="card-title">NATO Phonetic Alphabet <span class="badge badge-classic">Code</span></div>
+      <label>Input Text</label>
+      <textarea id="nato-in" placeholder="Enter text or NATO words (e.g. Alpha Bravo)..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="natoDo(true)">To NATO</button>
+        <button class="btn btn-secondary btn-sm" onclick="natoDo(false)">From NATO</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('nato-in','nato-out')">Clear</button>
+      </div>
+      <div class="output" id="nato-out"><button class="copy-btn" onclick="copyOut('nato-out')">copy</button></div>
+    </div>
+
+    <!-- Baudot/ITA2 -->
+    <div class="card" data-cat="code modern">
+      <div class="card-title">Baudot / ITA2 <span class="badge badge-modern">Telegraph</span></div>
+      <label>Input Text</label>
+      <textarea id="baudot-in" placeholder="Enter text..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="baudotDo(true)">To Baudot</button>
+        <button class="btn btn-secondary btn-sm" onclick="baudotDo(false)">From Baudot</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('baudot-in','baudot-out')">Clear</button>
+      </div>
+      <div class="output" id="baudot-out"><button class="copy-btn" onclick="copyOut('baudot-out')">copy</button></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== HASH ===== -->
+<div class="panel" id="panel-hash">
+  <h2 class="section-heading">Hash Functions</h2>
+  <p class="section-sub">One-way cryptographic hashes — MD5, SHA family, and more.</p>
+  <div class="card" style="max-width:800px">
+    <div class="card-title">Multi-Hash Generator <span class="badge badge-hash">Hash</span></div>
+    <label>Input Text</label>
+    <textarea id="hash-in" placeholder="Enter text to hash..." style="height:80px" oninput="generateHashes()"></textarea>
+    <div class="hash-row" id="hash-results">
+      <div style="color:var(--muted); font-size:0.82rem; padding:0.5rem;">Type something above to see hashes...</div>
+    </div>
+  </div>
+  <br>
+  <div class="card" style="max-width:800px">
+    <div class="card-title">HMAC Generator <span class="badge badge-hash">Hash</span></div>
+    <label>Message</label>
+    <textarea id="hmac-msg" placeholder="Enter message..." style="height:70px"></textarea>
+    <div class="key-input-row" style="margin-top:0.75rem">
+      <span class="key-label">Key</span>
+      <input type="text" id="hmac-key" placeholder="Secret key" value="secret">
+      <select id="hmac-algo">
+        <option>SHA-256</option>
+        <option>SHA-384</option>
+        <option>SHA-512</option>
+        <option>SHA-1</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm" onclick="generateHMAC()">Generate HMAC</button>
+    </div>
+    <div class="output" id="hmac-out"><button class="copy-btn" onclick="copyOut('hmac-out')">copy</button></div>
+  </div>
+</div>
+
+<!-- ===== UNIT CONVERTER ===== -->
+<div class="panel" id="panel-convert">
+  <h2 class="section-heading">Unit Converter</h2>
+  <p class="section-sub">Length, weight, temperature, area, volume, speed, data, time, and more.</p>
+
+  <div class="cat-pills">
+    <div class="cat-pill active" onclick="setUnitCat('length',this)">Length</div>
+    <div class="cat-pill" onclick="setUnitCat('weight',this)">Weight</div>
+    <div class="cat-pill" onclick="setUnitCat('temperature',this)">Temperature</div>
+    <div class="cat-pill" onclick="setUnitCat('area',this)">Area</div>
+    <div class="cat-pill" onclick="setUnitCat('volume',this)">Volume</div>
+    <div class="cat-pill" onclick="setUnitCat('speed',this)">Speed</div>
+    <div class="cat-pill" onclick="setUnitCat('data',this)">Data</div>
+    <div class="cat-pill" onclick="setUnitCat('time',this)">Time</div>
+    <div class="cat-pill" onclick="setUnitCat('energy',this)">Energy</div>
+    <div class="cat-pill" onclick="setUnitCat('pressure',this)">Pressure</div>
+    <div class="cat-pill" onclick="setUnitCat('angle',this)">Angle</div>
+  </div>
+
+  <div class="card" style="max-width:700px">
+    <div class="converter-grid">
+      <div>
+        <label>From</label>
+        <select id="unit-from" onchange="doUnitConvert()" style="width:100%; margin-bottom:0.5rem"></select>
+        <input type="number" id="unit-val" value="1" oninput="doUnitConvert()" style="width:100%">
+      </div>
+      <button class="swap-btn" onclick="swapUnits()">⇄</button>
+      <div>
+        <label>To</label>
+        <select id="unit-to" onchange="doUnitConvert()" style="width:100%; margin-bottom:0.5rem"></select>
+        <input type="text" id="unit-result" readonly style="width:100%; background:var(--bg); color:var(--accent)">
+      </div>
+    </div>
+    <div style="margin-top:1rem; font-size:0.8rem; color:var(--muted); font-family:'Space Mono',monospace" id="unit-formula"></div>
+  </div>
+
+  <br>
+  <!-- Quick reference table -->
+  <div class="card" style="max-width:700px">
+    <div class="card-title">All Conversions at a Glance</div>
+    <div id="unit-table" style="font-family:'Space Mono',monospace; font-size:0.8rem; line-height:2; color:var(--muted)"></div>
+  </div>
+</div>
+
+<!-- ===== BASE CONVERT ===== -->
+<div class="panel" id="panel-base">
+  <h2 class="section-heading">Number Base Converter</h2>
+  <p class="section-sub">Convert between Binary, Octal, Decimal, Hex, and custom bases.</p>
+
+  <div class="card" style="max-width:700px">
+    <div class="card-title">Multi-Base Converter</div>
+    <label>Enter Number</label>
+    <div style="display:flex; gap:0.5rem; margin-bottom:1rem">
+      <input type="text" id="base-in" placeholder="Enter number..." style="flex:1" oninput="doBaseConvert()">
+      <select id="base-from" onchange="doBaseConvert()" style="width:130px">
+        <option value="2">Binary (2)</option>
+        <option value="8">Octal (8)</option>
+        <option value="10" selected>Decimal (10)</option>
+        <option value="16">Hex (16)</option>
+        <option value="32">Base 32</option>
+        <option value="36">Base 36</option>
+        <option value="64">Base 64</option>
+      </select>
+    </div>
+    <div class="base-grid" id="base-results"></div>
+  </div>
+
+  <br>
+  <div class="card" style="max-width:700px">
+    <div class="card-title">Arbitrary Base Converter</div>
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:end">
+      <div>
+        <label>Number</label>
+        <input type="text" id="arb-in" placeholder="Input" oninput="doArbBase()">
+      </div>
+      <div>
+        <label>From Base</label>
+        <input type="number" id="arb-from" value="10" min="2" max="36" style="width:80px" oninput="doArbBase()">
+      </div>
+      <div>
+        <label>To Base</label>
+        <input type="number" id="arb-to" value="2" min="2" max="36" style="width:80px" oninput="doArbBase()">
+      </div>
+    </div>
+    <div class="output" id="arb-out" style="margin-top:0.75rem"><button class="copy-btn" onclick="copyOut('arb-out')">copy</button></div>
+  </div>
+</div>
+
+<!-- ===== COLOR TOOLS ===== -->
+<div class="panel" id="panel-color">
+  <h2 class="section-heading">Color Tools</h2>
+  <p class="section-sub">Convert between color spaces, generate palettes, and analyze colors.</p>
+
+  <div class="tool-grid">
+    <div class="card">
+      <div class="card-title">Color Converter</div>
+      <div class="color-preview" id="color-preview" style="background:#00e5ff"></div>
+      <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.75rem">
+        <input type="color" id="color-picker" value="#00e5ff" oninput="onColorPick(this.value)">
+        <input type="text" id="color-hex-in" value="#00e5ff" placeholder="#rrggbb" style="flex:1" oninput="onHexType(this.value)">
+      </div>
+      <div id="color-conversions" style="font-family:'Space Mono',monospace; font-size:0.82rem; line-height:2.2; display:grid; grid-template-columns:1fr 1fr; gap:0.25rem 1rem"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Palette Generator</div>
+      <label>Base Color</label>
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem">
+        <input type="color" id="pal-color" value="#7c3aed" oninput="genPalette()">
+        <select id="pal-type" onchange="genPalette()" style="flex:1">
+          <option value="complementary">Complementary</option>
+          <option value="analogous">Analogous</option>
+          <option value="triadic">Triadic</option>
+          <option value="split">Split Complementary</option>
+          <option value="tetradic">Tetradic</option>
+          <option value="tints">Tints</option>
+          <option value="shades">Shades</option>
+        </select>
+      </div>
+      <div id="palette-swatches" style="display:flex; gap:0.5rem; flex-wrap:wrap"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Contrast Checker <span class="badge badge-modern">Accessibility</span></div>
+      <div style="display:flex; gap:0.75rem; align-items:center; margin-bottom:1rem">
+        <div><label>Foreground</label><input type="color" id="fg-color" value="#ffffff" oninput="checkContrast()"></div>
+        <div><label>Background</label><input type="color" id="bg-color" value="#0a0a0f" oninput="checkContrast()"></div>
+      </div>
+      <div id="contrast-preview" style="padding:1.5rem; border-radius:10px; text-align:center; margin-bottom:1rem; transition:all 0.3s">
+        <p style="font-size:1.2rem; font-weight:700">Sample Text Preview</p>
+        <p style="font-size:0.85rem">The quick brown fox jumps over the lazy dog</p>
+      </div>
+      <div id="contrast-result" style="font-size:0.85rem; line-height:2"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Color Name Finder</div>
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem">
+        <input type="color" id="name-color" value="#ff6b6b" oninput="findColorName(this.value)" style="flex-shrink:0">
+        <input type="text" id="name-hex" value="#ff6b6b" placeholder="#rrggbb" style="flex:1" oninput="findColorNameFromText(this.value)">
+      </div>
+      <div class="color-preview" id="name-preview" style="background:#ff6b6b; height:60px"></div>
+      <div id="name-result" style="margin-top:0.75rem; font-size:0.9rem; line-height:1.8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MISC TOOLS ===== -->
+<div class="panel" id="panel-misc">
+  <h2 class="section-heading">Misc Tools</h2>
+  <p class="section-sub">Text utilities, random generators, time tools, and more.</p>
+
+  <div class="tool-grid">
+
+    <div class="card">
+      <div class="card-title">Text Statistics</div>
+      <textarea id="stat-in" placeholder="Paste any text..." style="height:120px" oninput="doStats()"></textarea>
+      <div id="stat-out" style="margin-top:0.75rem; font-family:'Space Mono',monospace; font-size:0.82rem; line-height:2.2; display:grid; grid-template-columns:1fr 1fr; gap:0.25rem 1rem; color:var(--muted)"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Random Generator</div>
+      <div class="mini-tabs">
+        <button class="mini-tab active" onclick="setRandTab('password',this)">Password</button>
+        <button class="mini-tab" onclick="setRandTab('uuid',this)">UUID</button>
+        <button class="mini-tab" onclick="setRandTab('number',this)">Number</button>
+        <button class="mini-tab" onclick="setRandTab('bytes',this)">Hex Bytes</button>
+      </div>
+      <div id="rand-password-opts">
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem">
+          <div><label>Length</label><input type="number" id="rand-len" value="16" min="4" max="128" style="width:80px"></div>
+          <div style="display:flex; align-items:end; gap:0.5rem; padding-bottom:0.1rem">
+            <label style="display:flex;align-items:center;gap:0.3rem;color:var(--text)"><input type="checkbox" id="rand-upper" checked> Uppercase</label>
+            <label style="display:flex;align-items:center;gap:0.3rem;color:var(--text)"><input type="checkbox" id="rand-num" checked> Numbers</label>
+            <label style="display:flex;align-items:center;gap:0.3rem;color:var(--text)"><input type="checkbox" id="rand-sym" checked> Symbols</label>
+          </div>
         </div>
-        <div class="flex items-center space-x-6 text-sm font-medium">
-            <select id="methodSelect" class="bg-transparent border-none outline-none font-mono text-cypherBlue cursor-pointer opacity-70 hover:opacity-100 transition">
-                <option value="binary">Bits (Char to Bit)</option>
-                <option value="base64">Base64</option>
-                <option value="rot13">ROT13</option>
-                <option value="atbash">Atbash Cipher</option>
-                <option value="hex">Hexadecimal</option>
-                <option value="reverse">Reverse Text</option>
-            </select>
-            <button id="toggleMode" class="bg-black text-white dark:bg-white dark:text-black px-4 py-1.5 rounded-full text-xs hover:scale-105 transition-transform active:scale-95">Encode</button>
+      </div>
+      <div id="rand-uuid-opts" style="display:none; margin-bottom:0.75rem">
+        <label>UUID Version</label>
+        <select id="rand-uuid-ver"><option value="4">v4 (Random)</option><option value="1">v1 (Timestamp)</option></select>
+      </div>
+      <div id="rand-number-opts" style="display:none">
+        <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem">
+          <div><label>Min</label><input type="number" id="rand-min" value="1" style="width:90px"></div>
+          <div><label>Max</label><input type="number" id="rand-max" value="100" style="width:90px"></div>
         </div>
-    </nav>
+      </div>
+      <div id="rand-bytes-opts" style="display:none">
+        <div style="margin-bottom:0.75rem"><label>Byte Count</label><input type="number" id="rand-byte-cnt" value="16" min="1" max="256" style="width:90px"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="generateRandom()">Generate</button>
+      <div class="output" id="rand-out" style="margin-top:0.75rem"><button class="copy-btn" onclick="copyOut('rand-out')">copy</button></div>
+    </div>
 
-    <main class="max-w-5xl mx-auto px-6 pt-12 pb-24">
-        <div class="text-center mb-12">
-            <h1 class="text-5xl md:text-6xl font-semibold tracking-tight mb-4">
-                Decode the <span id="heroSpan" class="text-cypherBlue transition-all">Unseen.</span>
-            </h1>
-            <p id="heroSub" class="text-lg opacity-40 max-w-xl mx-auto leading-relaxed">
-                Paste your strings and let <span class="font-mono text-cypherPurple italic">ツ</span> handle the math.
-            </p>
-        </div>
+    <div class="card">
+      <div class="card-title">Timestamp Converter</div>
+      <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap">
+        <input type="number" id="ts-unix" placeholder="Unix timestamp" style="flex:1" oninput="tsFromUnix()">
+        <button class="btn btn-secondary btn-sm" onclick="tsNow()">Now</button>
+      </div>
+      <div id="ts-results" style="font-family:'Space Mono',monospace; font-size:0.8rem; line-height:2.2; color:var(--muted)"></div>
+      <div style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem">
+        <label>Date/Time to Unix</label>
+        <input type="datetime-local" id="ts-dt" style="width:100%; margin-top:0.3rem" onchange="tsFromDate()">
+        <div class="output" id="ts-unix-out" style="margin-top:0.5rem"><button class="copy-btn" onclick="copyOut('ts-unix-out')">copy</button></div>
+      </div>
+    </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[400px]">
-            
-            <div class="glass rounded-[2rem] p-8 flex flex-col relative transition-all duration-500 hover:shadow-2xl hover:shadow-cypherBlue/5">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-[10px] uppercase tracking-[0.2em] opacity-30 font-mono">Original String</span>
-                    <button onclick="clearInput()" class="text-[10px] opacity-30 hover:opacity-100 font-mono uppercase">Clear</button>
-                </div>
-                <textarea 
-                    id="inputArea"
-                    class="bg-transparent border-none focus:ring-0 w-full h-full text-xl md:text-2xl font-mono placeholder:opacity-100 resize-none custom-scrollbar outline-none"
-                    placeholder="Type here..."
-                ></textarea>
-            </div>
+    <div class="card">
+      <div class="card-title">String Transformer</div>
+      <textarea id="transform-in" placeholder="Enter text to transform..." style="height:90px"></textarea>
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.75rem">
+        <button class="btn btn-secondary btn-sm" onclick="transform('upper')">UPPER</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('lower')">lower</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('title')">Title</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('snake')">snake_case</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('camel')">camelCase</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('kebab')">kebab-case</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('pascal')">PascalCase</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('reverse')">esreveR</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('flip')">ɟlᴉd</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('trim')">Trim</button>
+        <button class="btn btn-secondary btn-sm" onclick="transform('nodups')">Remove Dups</button>
+      </div>
+      <div class="output" id="transform-out" style="margin-top:0.75rem"><button class="copy-btn" onclick="copyOut('transform-out')">copy</button></div>
+    </div>
 
-            <div id="outputPanel" class="glass rounded-[2rem] p-8 flex flex-col relative border-cypherBlue/10 transition-all duration-500">
-                <div class="flex justify-between items-center mb-4">
-                    <span id="outputLabel" class="text-[10px] uppercase tracking-[0.2em] opacity-30 font-mono">Result</span>
-                    <div id="statusIcon" class="text-xl animate-bounce-subtle cursor-help">ツ</div>
-                </div>
-                <div id="outputArea" class="text-xl md:text-2xl font-mono text-cypherBlue break-all leading-relaxed custom-scrollbar overflow-y-auto max-h-64">
-                    ¯\_(ツ)_/¯
-                </div>
-                
-                <div class="mt-auto pt-6 border-t border-white/5 text-[10px] opacity-30 leading-relaxed font-mono flex justify-between">
-                    <div><span class="text-cypherPurple">LOG:</span> <span id="logText">System idle. Ready to process.</span></div>
-                    <div id="charCount">0 chars</div>
-                </div>
-            </div>
+    <div class="card">
+      <div class="card-title">JSON Formatter</div>
+      <div class="mini-tabs">
+        <button class="mini-tab active" onclick="setJsonTab('format',this)">Format</button>
+        <button class="mini-tab" onclick="setJsonTab('minify',this)">Minify</button>
+        <button class="mini-tab" onclick="setJsonTab('validate',this)">Validate</button>
+      </div>
+      <textarea id="json-in" placeholder='{"key": "value"}' style="height:120px"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="doJSON()">Apply</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('json-in','json-out')">Clear</button>
+      </div>
+      <div class="output" id="json-out" style="height:120px; overflow:auto"><button class="copy-btn" onclick="copyOut('json-out')">copy</button></div>
+    </div>
 
-        </div>
-    </main>
+    <div class="card">
+      <div class="card-title">Regex Tester</div>
+      <label>Pattern</label>
+      <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem">
+        <input type="text" id="regex-pattern" placeholder="([a-z]+)" style="flex:1" oninput="doRegex()">
+        <input type="text" id="regex-flags" value="gi" style="width:60px" oninput="doRegex()" placeholder="flags">
+      </div>
+      <label>Test String</label>
+      <textarea id="regex-in" placeholder="Enter test string..." style="height:80px" oninput="doRegex()"></textarea>
+      <div id="regex-out" style="margin-top:0.75rem; font-size:0.82rem; line-height:1.8; font-family:'Space Mono',monospace"></div>
+    </div>
 
-    <script>
-        const inputArea = document.getElementById('inputArea');
-        const outputArea = document.getElementById('outputArea');
-        const logText = document.getElementById('logText');
-        const statusIcon = document.getElementById('statusIcon');
-        const methodSelect = document.getElementById('methodSelect');
-        const toggleMode = document.getElementById('toggleMode');
-        const charCount = document.getElementById('charCount');
-        const heroSpan = document.getElementById('heroSpan');
+  </div>
+</div>
 
-        let isEncoding = true;
+</main>
 
-        // Toggle Encode/Decode
-        toggleMode.addEventListener('click', () => {
-            isEncoding = !isEncoding;
-            toggleMode.innerText = isEncoding ? 'Encode' : 'Decode';
-            toggleMode.classList.toggle('bg-cypherBlue');
-            toggleMode.classList.toggle('text-white');
-            process();
-        });
+<script>
+// =================== NAV ===================
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('nav button').forEach((b,i) => b.classList.remove('active'));
+  const btns = document.querySelectorAll('nav button');
+  const map = {encode:0,hash:1,convert:2,base:3,color:4,misc:5};
+  btns[map[id]].classList.add('active');
+}
 
-        // Conversion Logic
-        const converters = {
-            binary: (str) => {
-                if (isEncoding) {
-                    return str.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
-                } else {
-                    return str.split(' ').map(bin => String.fromCharCode(parseInt(bin, 2))).join('');
-                }
-            },
-            base64: (str) => {
-                try {
-                    return isEncoding ? btoa(str) : atob(str);
-                } catch(e) { return "Invalid Base64 Data"; }
-            },
-            rot13: (str) => {
-                return str.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
-            },
-            atbash: (str) => {
-                return str.replace(/[a-z]/gi, (c) => {
-                    const n = c.charCodeAt(0);
-                    const base = n >= 97 ? 97 : 65;
-                    return String.fromCharCode(base + 25 - (n - base));
-                });
-            },
-            hex: (str) => {
-                if (isEncoding) {
-                    return str.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
-                } else {
-                    return str.split(' ').map(h => String.fromCharCode(parseInt(h, 16))).join('');
-                }
-            },
-            reverse: (str) => str.split('').reverse().join('')
-        };
+// =================== UTILS ===================
+function setOut(id, val) {
+  const el = document.getElementById(id);
+  const btn = el.querySelector('.copy-btn');
+  el.textContent = val;
+  if(btn) el.appendChild(btn);
+}
 
-        function process() {
-            const val = inputArea.value;
-            const method = methodSelect.value;
-            charCount.innerText = `${val.length} chars`;
+function copyOut(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent.replace('copy','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
 
-            if(val.length > 0) {
-                // Mascot reactions
-                if (val.includes('ツ')) statusIcon.innerText = 'ヾ(ツ)ノ';
-                else if (val.length > 20) statusIcon.innerText = '(⊙_⊙)';
-                else statusIcon.innerText = '(._.)';
+function clear2(inId, outId) {
+  document.getElementById(inId).value = '';
+  setOut(outId, '');
+}
 
-                logText.innerText = `Applying ${method} ${isEncoding ? 'encoding' : 'decoding'}...`;
-                
-                try {
-                    const result = converters[method](val);
-                    outputArea.innerText = result;
-                    outputArea.classList.remove('text-red-500');
-                } catch (e) {
-                    outputArea.innerText = "Error processing data.";
-                    outputArea.classList.add('text-red-500');
-                    statusIcon.innerText = '(×_×)';
-                }
+function filterCat(cat, el) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#encode-grid .card').forEach(c => {
+    if(cat === 'all') { c.style.display = ''; return; }
+    const cats = (c.dataset.cat || '').split(' ');
+    c.style.display = cats.includes(cat) ? '' : 'none';
+  });
+}
 
-                // Easter Eggs triggered by words
-                if (val.toLowerCase() === 'glitch') {
-                    document.body.classList.add('glitch-mode');
-                    heroSpan.innerText = "Glitching.";
-                } else if (val.toLowerCase() === 'rainbow') {
-                    heroSpan.className = "bg-gradient-to-r from-red-500 via-green-500 to-blue-500 bg-clip-text text-transparent animate-pulse";
-                } else {
-                    document.body.classList.remove('glitch-mode');
-                    heroSpan.innerText = "Unseen.";
-                    heroSpan.className = "text-cypherBlue";
-                }
+// =================== CAESAR ===================
+function caesarDo(encode) {
+  const text = document.getElementById('caesar-in').value;
+  const shift = parseInt(document.getElementById('caesar-key').value) % 26;
+  const s = encode ? shift : (26 - shift) % 26;
+  const result = text.replace(/[a-zA-Z]/g, c => {
+    const base = c >= 'a' ? 97 : 65;
+    return String.fromCharCode(((c.charCodeAt(0) - base + s) % 26) + base);
+  });
+  setOut('caesar-out', result);
+}
 
-            } else {
-                statusIcon.innerText = 'ツ';
-                outputArea.innerText = '¯\\_(ツ)_/¯';
-                logText.innerText = "System idle. Ready to process.";
-            }
-            const placeholders = {
-    binary: "Example: 01001000 01001001...",
-    base64: "Example: SGVsbG8gVHp1IQ==...",
-    rot13: "Enter text to shift (A becomes N)...",
-    atbash: "Enter text to flip (A becomes Z)...",
-    hex: "Example: 48 65 6c 6c 6f...",
-    reverse: "Type something to flip it backwards..."
+// =================== ROT13 ===================
+function doRot13() {
+  const text = document.getElementById('rot13-in').value;
+  setOut('rot13-out', text.replace(/[a-zA-Z]/g, c => {
+    const base = c >= 'a' ? 97 : 65;
+    return String.fromCharCode(((c.charCodeAt(0) - base + 13) % 26) + base);
+  }));
+}
+
+// =================== VIGENÈRE ===================
+function vigenereDo(encode) {
+  const text = document.getElementById('vig-in').value;
+  const key = document.getElementById('vig-key').value.toUpperCase().replace(/[^A-Z]/g,'') || 'A';
+  let ki = 0, result = '';
+  for(let ch of text) {
+    if(/[a-zA-Z]/.test(ch)) {
+      const base = ch >= 'a' ? 97 : 65;
+      const k = key.charCodeAt(ki % key.length) - 65;
+      const shift = encode ? k : (26 - k);
+      result += String.fromCharCode(((ch.charCodeAt(0) - base + shift) % 26) + base);
+      ki++;
+    } else result += ch;
+  }
+  setOut('vig-out', result);
+}
+
+// =================== ATBASH ===================
+function doAtbash() {
+  const text = document.getElementById('atbash-in').value;
+  setOut('atbash-out', text.replace(/[a-zA-Z]/g, c => {
+    const base = c >= 'a' ? 97 : 65;
+    return String.fromCharCode(base + (25 - (c.charCodeAt(0) - base)));
+  }));
+}
+
+// =================== AFFINE ===================
+function modInverse(a, m) {
+  for(let x = 1; x < m; x++) if((a * x) % m === 1) return x;
+  return -1;
+}
+function affineDo(encode) {
+  let a = parseInt(document.getElementById('affine-a').value);
+  let b = parseInt(document.getElementById('affine-b').value);
+  const text = document.getElementById('affine-in').value;
+  if(modInverse(a, 26) === -1) { setOut('affine-out', 'Error: a must be coprime to 26'); return; }
+  const aInv = modInverse(a, 26);
+  const result = text.replace(/[a-zA-Z]/g, c => {
+    const base = c >= 'a' ? 97 : 65;
+    const x = c.charCodeAt(0) - base;
+    const y = encode ? (a * x + b) % 26 : (aInv * (x - b + 26)) % 26;
+    return String.fromCharCode(y + base);
+  });
+  setOut('affine-out', result);
+}
+
+// =================== RAIL FENCE ===================
+function railFenceEncode(text, rails) {
+  const fence = Array.from({length:rails}, () => []);
+  let r = 0, dir = 1;
+  for(let c of text) {
+    fence[r].push(c);
+    if(r === 0) dir = 1;
+    else if(r === rails-1) dir = -1;
+    r += dir;
+  }
+  return fence.flat().join('');
+}
+function railFenceDecode(text, rails) {
+  const n = text.length;
+  const indices = Array(n).fill(0);
+  let r = 0, dir = 1;
+  for(let i = 0; i < n; i++) {
+    indices[i] = r;
+    if(r === 0) dir = 1;
+    else if(r === rails-1) dir = -1;
+    r += dir;
+  }
+  const order = [...Array(n).keys()].sort((a,b) => indices[a]-indices[b] || a-b);
+  const result = Array(n);
+  for(let i = 0; i < n; i++) result[order[i]] = text[i];
+  return result.join('');
+}
+function railDo(encode) {
+  const text = document.getElementById('rail-in').value;
+  const rails = parseInt(document.getElementById('rail-key').value);
+  setOut('rail-out', encode ? railFenceEncode(text,rails) : railFenceDecode(text,rails));
+}
+
+// =================== COLUMNAR TRANSPOSITION ===================
+function columnarDo(encode) {
+  const text = document.getElementById('col-in').value.replace(/\s/g,'');
+  const key = document.getElementById('col-key').value.toUpperCase();
+  const order = [...key].map((c,i) => [c,i]).sort().map(x => x[1]);
+  const cols = key.length;
+  const rows = Math.ceil(text.length / cols);
+  if(encode) {
+    const grid = [];
+    for(let r = 0; r < rows; r++) {
+      grid.push(text.substr(r*cols, cols).padEnd(cols, 'X').split(''));
+    }
+    setOut('col-out', order.map(c => grid.map(r => r[c]).join('')).join(' '));
+  } else {
+    const colLens = order.map((c,i) => rows - (i >= text.length % cols && text.length % cols !== 0 ? 1 : 0));
+    const colData = {};
+    let pos = 0;
+    order.forEach((origCol, sortIdx) => {
+      const len = rows;
+      colData[origCol] = text.replace(/\s/g,'').substr(pos, len);
+      pos += len;
+    });
+    let result = '';
+    for(let r = 0; r < rows; r++)
+      for(let c = 0; c < cols; c++)
+        result += colData[c]?.[r] || '';
+    setOut('col-out', result.replace(/X+$/, ''));
+  }
+}
+
+// =================== BACON'S CIPHER ===================
+const BACON = {'A':'AAAAA','B':'AAAAB','C':'AAABA','D':'AAABB','E':'AABAA',
+ 'F':'AABAB','G':'AABBA','H':'AABBB','I':'ABAAA','J':'ABAAA','K':'ABAAB',
+ 'L':'ABABA','M':'ABABB','N':'ABBAA','O':'ABBAB','P':'ABBBA','Q':'ABBBB',
+ 'R':'BAAAA','S':'BAAAB','T':'BAABA','U':'BAABB','V':'BABAA','W':'BABAB',
+ 'X':'BABBA','Y':'BABBB','Z':'BBAAA'};
+const BACON_INV = Object.fromEntries(Object.entries(BACON).map(([k,v])=>[v,k]));
+function baconDo(encode) {
+  const text = document.getElementById('bacon-in').value;
+  if(encode) {
+    setOut('bacon-out', text.toUpperCase().replace(/[A-Z]/g, c => BACON[c] || c).replace(/[^AB\s]/g,''));
+  } else {
+    const clean = text.toUpperCase().replace(/[^AB]/g,'');
+    let result = '';
+    for(let i=0;i<clean.length;i+=5) {
+      const code = clean.substr(i,5);
+      result += BACON_INV[code] || '?';
+    }
+    setOut('bacon-out', result);
+  }
+}
+
+// =================== POLYBIUS ===================
+function polybiusDo(encode) {
+  const text = document.getElementById('polybius-in').value;
+  const sq = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'; // I=J
+  if(encode) {
+    setOut('polybius-out', text.toUpperCase().replace(/J/g,'I').replace(/[A-Z]/g, c => {
+      const i = sq.indexOf(c);
+      return i >= 0 ? `${Math.floor(i/5)+1}${(i%5)+1}` : c;
+    }));
+  } else {
+    const d = text.replace(/\s/g,'');
+    let result = '';
+    for(let i=0;i<d.length;i+=2) {
+      const r = parseInt(d[i])-1, c = parseInt(d[i+1])-1;
+      if(!isNaN(r)&&!isNaN(c)) result += sq[r*5+c]||'?';
+    }
+    setOut('polybius-out', result);
+  }
+}
+
+// =================== PLAYFAIR ===================
+function makePlayfairMatrix(key) {
+  const seen = new Set();
+  const mat = [];
+  const k = (key.toUpperCase().replace(/J/g,'I') + 'ABCDEFGHIKLMNOPQRSTUVWXYZ').replace(/[^A-Z]/g,'');
+  for(const c of k) {
+    if(!seen.has(c)) { seen.add(c); mat.push(c); }
+  }
+  return mat;
+}
+function playfairDo(encode) {
+  const key = document.getElementById('play-key').value;
+  let text = document.getElementById('play-in').value.toUpperCase().replace(/J/g,'I').replace(/[^A-Z]/g,'');
+  const mat = makePlayfairMatrix(key);
+  const pos = {};
+  mat.forEach((c,i) => { pos[c] = {r:Math.floor(i/5), c:i%5}; });
+  // prepare digraphs
+  let pairs = [];
+  let i = 0;
+  while(i < text.length) {
+    let a = text[i], b = text[i+1] || 'X';
+    if(a === b) { b = 'X'; i++; } else i += 2;
+    pairs.push([a,b]);
+  }
+  const d = encode ? 1 : -1;
+  const result = pairs.map(([a,b]) => {
+    const pa = pos[a], pb = pos[b];
+    if(pa.r === pb.r) {
+      return mat[pa.r*5+((pa.c+d+5)%5)] + mat[pb.r*5+((pb.c+d+5)%5)];
+    } else if(pa.c === pb.c) {
+      return mat[((pa.r+d+5)%5)*5+pa.c] + mat[((pb.r+d+5)%5)*5+pb.c];
+    } else {
+      return mat[pa.r*5+pb.c] + mat[pb.r*5+pa.c];
+    }
+  }).join('');
+  setOut('play-out', result);
+}
+
+// =================== BASE64 ===================
+function b64Do(encode) {
+  try {
+    const text = document.getElementById('b64-in').value;
+    setOut('b64-out', encode ? btoa(unescape(encodeURIComponent(text))) : decodeURIComponent(escape(atob(text))));
+  } catch(e) { setOut('b64-out', 'Error: ' + e.message); }
+}
+
+// =================== URL ===================
+function urlDo(encode) {
+  const text = document.getElementById('url-in').value;
+  try {
+    setOut('url-out', encode ? encodeURIComponent(text) : decodeURIComponent(text));
+  } catch(e) { setOut('url-out', 'Error: invalid encoding'); }
+}
+
+// =================== HTML ENTITIES ===================
+function htmlDo(encode) {
+  const text = document.getElementById('html-in').value;
+  if(encode) {
+    setOut('html-out', text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'));
+  } else {
+    const d = document.createElement('div');
+    d.innerHTML = text;
+    setOut('html-out', d.textContent);
+  }
+}
+
+// =================== MORSE ===================
+const MORSE_MAP = {
+  'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---',
+  'K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-',
+  'U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+  '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',
+  '.':'.-.-.-',',':'--..--','?':'..--..','!':'-.-.--','/':"-..-.",'(':'-.--.',')':'-.--.-','&':'.-...',':':'---...',
+  ';':'-.-.-.','=':'-...-','+':'.-.-.','_':'..--.-','"':'.-..-.','$':'...-..-','@':'.--.-.',' ':'/'
+};
+const MORSE_INV = Object.fromEntries(Object.entries(MORSE_MAP).map(([k,v])=>[v,k]));
+function morseDo(encode) {
+  const text = document.getElementById('morse-in').value;
+  if(encode) {
+    setOut('morse-out', text.toUpperCase().split('').map(c => MORSE_MAP[c] || c).join(' '));
+  } else {
+    setOut('morse-out', text.trim().split(' / ').map(w => w.split(' ').map(c => MORSE_INV[c] || '?').join('')).join(' '));
+  }
+}
+
+// =================== BINARY ===================
+function binDo(encode) {
+  const text = document.getElementById('bin-in').value;
+  if(encode) {
+    setOut('bin-out', text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8,'0')).join(' '));
+  } else {
+    try {
+      setOut('bin-out', text.trim().split(/\s+/).map(b => String.fromCharCode(parseInt(b,2))).join(''));
+    } catch(e) { setOut('bin-out', 'Error parsing binary'); }
+  }
+}
+
+// =================== HEX ===================
+function hexDo(encode) {
+  const text = document.getElementById('hex-in').value;
+  if(encode) {
+    setOut('hex-out', Array.from(text).map(c => c.charCodeAt(0).toString(16).padStart(2,'0')).join(' '));
+  } else {
+    try {
+      setOut('hex-out', text.replace(/\s/g,'').match(/.{1,2}/g).map(h => String.fromCharCode(parseInt(h,16))).join(''));
+    } catch(e) { setOut('hex-out', 'Error parsing hex'); }
+  }
+}
+
+// =================== XOR ===================
+function xorDo() {
+  const text = document.getElementById('xor-in').value;
+  const key = document.getElementById('xor-key').value || 'k';
+  const result = Array.from(text).map((c,i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i%key.length))).join('');
+  const hex = Array.from(result).map(c => c.charCodeAt(0).toString(16).padStart(2,'0')).join(' ');
+  setOut('xor-out', `Text: ${result}\nHex:  ${hex}`);
+}
+
+// =================== BEAUFORT ===================
+function beaufortDo() {
+  const text = document.getElementById('beau-in').value;
+  const key = document.getElementById('beau-key').value.toUpperCase().replace(/[^A-Z]/g,'') || 'A';
+  let ki = 0, result = '';
+  for(let ch of text) {
+    if(/[a-zA-Z]/.test(ch)) {
+      const base = ch >= 'a' ? 97 : 65;
+      const k = key.charCodeAt(ki % key.length) - 65;
+      const x = ch.charCodeAt(0) - base;
+      result += String.fromCharCode(((k - x + 26) % 26) + base);
+      ki++;
+    } else result += ch;
+  }
+  setOut('beau-out', result);
+}
+
+// =================== NATO ===================
+const NATO = {A:'Alpha',B:'Bravo',C:'Charlie',D:'Delta',E:'Echo',F:'Foxtrot',G:'Golf',H:'Hotel',
+  I:'India',J:'Juliet',K:'Kilo',L:'Lima',M:'Mike',N:'November',O:'Oscar',P:'Papa',Q:'Quebec',
+  R:'Romeo',S:'Sierra',T:'Tango',U:'Uniform',V:'Victor',W:'Whiskey',X:'X-ray',Y:'Yankee',Z:'Zulu',
+  '0':'Zero','1':'One','2':'Two','3':'Three','4':'Four','5':'Five','6':'Six','7':'Seven','8':'Eight','9':'Nine'};
+const NATO_INV = Object.fromEntries(Object.entries(NATO).map(([k,v])=>[v.toUpperCase(),k]));
+function natoDo(encode) {
+  const text = document.getElementById('nato-in').value;
+  if(encode) {
+    setOut('nato-out', text.toUpperCase().split('').map(c => NATO[c] || c).join(' '));
+  } else {
+    setOut('nato-out', text.split(/\s+/).map(w => NATO_INV[w.toUpperCase()] || w).join(''));
+  }
+}
+
+// =================== BAUDOT ===================
+const ITA2_MAP = {
+  '\r':'\x01','\n':'\x02',' ':'\x04','!':'\x16','"':'\x11','#':'\x14','$':'\x09','\'':'\x05',
+  '(':'\x0F',')':'\x12','*':'\x1C','+':'\x1A',',':'\x0C','-':'\x03','.':'\x07','/':'\x17',
+  '0':'\x16','1':'\x17','2':'\x13','3':'\x01','4':'\x0A','5':'\x10','6':'\x15','7':'\x07',
+  '8':'\x06','9':'\x0B',':':'\x0E',';':'\x1E','=':'\x1F','?':'\x19',
+  'A':'\x03','B':'\x19','C':'\x0E','D':'\x09','E':'\x01','F':'\x0D','G':'\x1A','H':'\x14',
+  'I':'\x06','J':'\x0B','K':'\x0F','L':'\x12','M':'\x1C','N':'\x0C','O':'\x18','P':'\x16',
+  'Q':'\x17','R':'\x0A','S':'\x05','T':'\x10','U':'\x07','V':'\x1E','W':'\x13','X':'\x1B',
+  'Y':'\x15','Z':'\x11'
+};
+function baudotDo(encode) {
+  const text = document.getElementById('baudot-in').value;
+  if(encode) {
+    const bits = text.toUpperCase().split('').map(c => {
+      const code = ITA2_MAP[c];
+      return code ? code.charCodeAt(0).toString(2).padStart(5,'0') : null;
+    }).filter(Boolean);
+    setOut('baudot-out', bits.join(' '));
+  } else {
+    const inv = Object.fromEntries(Object.entries(ITA2_MAP).map(([k,v])=>[v.charCodeAt(0),k]));
+    const result = text.trim().split(/\s+/).map(b => inv[parseInt(b,2)] || '?').join('');
+    setOut('baudot-out', result);
+  }
+}
+
+// =================== HASH ===================
+async function sha(algorithm, message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest(algorithm, msgBuffer);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function simpleMD5(str) {
+  // Simple MD5 implementation
+  function safeAdd(x,y){const lsw=(x&0xFFFF)+(y&0xFFFF),msw=Math.floor(x/65536)+Math.floor(y/65536)+(lsw>>16);return Math.floor(msw/65536)*4294967296+(msw&0xFFFF)*65536+(lsw&0xFFFF)}
+  function bitRotateLeft(num,cnt){return(num<<cnt)|(num>>>(32-cnt))}
+  function md5cmn(q,a,b,x,s,t){return safeAdd(bitRotateLeft(safeAdd(safeAdd(a,q),safeAdd(x,t)),s),b)}
+  function md5ff(a,b,c,d,x,s,t){return md5cmn((b&c)|((~b)&d),a,b,x,s,t)}
+  function md5gg(a,b,c,d,x,s,t){return md5cmn((b&d)|(c&(~d)),a,b,x,s,t)}
+  function md5hh(a,b,c,d,x,s,t){return md5cmn(b^c^d,a,b,x,s,t)}
+  function md5ii(a,b,c,d,x,s,t){return md5cmn(c^(b|(~d)),a,b,x,s,t)}
+  function md5blks(s){const md5blks=[];let i;for(i=0;i<s.length;i++)md5blks[i>>2]|=s.charCodeAt(i)<<((i%4)*8);md5blks[i>>2]|=0x80<<((i%4)*8);md5blks[((s.length+8)>>6<<4)+14]=s.length*8;return md5blks}
+  function md51(s){const n=s.length;const state=[1732584193,-271733879,-1732584194,271733878];const blks=md5blks(s);let a=state[0],b=state[1],c=state[2],d=state[3];for(let i=0;i<blks.length;i+=16){const olda=a,oldb=b,oldc=c,oldd=d;a=md5ff(a,b,c,d,blks[i],7,-680876936);d=md5ff(d,a,b,c,blks[i+1],12,-389564586);c=md5ff(c,d,a,b,blks[i+2],17,606105819);b=md5ff(b,c,d,a,blks[i+3],22,-1044525330);a=md5ff(a,b,c,d,blks[i+4],7,-176418897);d=md5ff(d,a,b,c,blks[i+5],12,1200080426);c=md5ff(c,d,a,b,blks[i+6],17,-1473231341);b=md5ff(b,c,d,a,blks[i+7],22,-45705983);a=md5ff(a,b,c,d,blks[i+8],7,1770035416);d=md5ff(d,a,b,c,blks[i+9],12,-1958414417);c=md5ff(c,d,a,b,blks[i+10],17,-42063);b=md5ff(b,c,d,a,blks[i+11],22,-1990404162);a=md5ff(a,b,c,d,blks[i+12],7,1804603682);d=md5ff(d,a,b,c,blks[i+13],12,-40341101);c=md5ff(c,d,a,b,blks[i+14],17,-1502002290);b=md5ff(b,c,d,a,blks[i+15],22,1236535329);a=md5gg(a,b,c,d,blks[i+1],5,-165796510);d=md5gg(d,a,b,c,blks[i+6],9,-1069501632);c=md5gg(c,d,a,b,blks[i+11],14,643717713);b=md5gg(b,c,d,a,blks[i],20,-373897302);a=md5gg(a,b,c,d,blks[i+5],5,-701558691);d=md5gg(d,a,b,c,blks[i+10],9,38016083);c=md5gg(c,d,a,b,blks[i+15],14,-660478335);b=md5gg(b,c,d,a,blks[i+4],20,-405537848);a=md5gg(a,b,c,d,blks[i+9],5,568446438);d=md5gg(d,a,b,c,blks[i+14],9,-1019803690);c=md5gg(c,d,a,b,blks[i+3],14,-187363961);b=md5gg(b,c,d,a,blks[i+8],20,1163531501);a=md5gg(a,b,c,d,blks[i+13],5,-1444681467);d=md5gg(d,a,b,c,blks[i+2],9,-51403784);c=md5gg(c,d,a,b,blks[i+7],14,1735328473);b=md5gg(b,c,d,a,blks[i+12],20,-1926607734);a=md5hh(a,b,c,d,blks[i+5],4,-378558);d=md5hh(d,a,b,c,blks[i+8],11,-2022574463);c=md5hh(c,d,a,b,blks[i+11],16,1839030562);b=md5hh(b,c,d,a,blks[i+14],23,-35309556);a=md5hh(a,b,c,d,blks[i+1],4,-1530992060);d=md5hh(d,a,b,c,blks[i+4],11,1272893353);c=md5hh(c,d,a,b,blks[i+7],16,-155497632);b=md5hh(b,c,d,a,blks[i+10],23,-1094730640);a=md5hh(a,b,c,d,blks[i+13],4,681279174);d=md5hh(d,a,b,c,blks[i],11,-358537222);c=md5hh(c,d,a,b,blks[i+3],16,-722521979);b=md5hh(b,c,d,a,blks[i+6],23,76029189);a=md5hh(a,b,c,d,blks[i+9],4,-640364487);d=md5hh(d,a,b,c,blks[i+12],11,-421815835);c=md5hh(c,d,a,b,blks[i+15],16,530742520);b=md5hh(b,c,d,a,blks[i+2],23,-995338651);a=md5ii(a,b,c,d,blks[i],6,-198630844);d=md5ii(d,a,b,c,blks[i+7],10,1126891415);c=md5ii(c,d,a,b,blks[i+14],15,-1416354905);b=md5ii(b,c,d,a,blks[i+5],21,-57434055);a=md5ii(a,b,c,d,blks[i+12],6,1700485571);d=md5ii(d,a,b,c,blks[i+3],10,-1894986606);c=md5ii(c,d,a,b,blks[i+10],15,-1051523);b=md5ii(b,c,d,a,blks[i+1],21,-2054922799);a=md5ii(a,b,c,d,blks[i+8],6,1873313359);d=md5ii(d,a,b,c,blks[i+15],10,-30611744);c=md5ii(c,d,a,b,blks[i+6],15,-1560198380);b=md5ii(b,c,d,a,blks[i+13],21,1309151649);a=md5ii(a,b,c,d,blks[i+4],6,-145523070);d=md5ii(d,a,b,c,blks[i+11],10,-1120210379);c=md5ii(c,d,a,b,blks[i+2],15,718787259);b=md5ii(b,c,d,a,blks[i+9],21,-343485551);a=safeAdd(a,olda);b=safeAdd(b,oldb);c=safeAdd(c,oldc);d=safeAdd(d,oldd)}
+  return[a,b,c,d]}
+  function rhex(n){let s='';for(let j=0;j<4;j++)s+=('0'+((n>>(j*8+4))&0x0F).toString(16))+('0'+((n>>(j*8))&0x0F).toString(16));return s}
+  const res=md51(str);return rhex(res[0])+rhex(res[1])+rhex(res[2])+rhex(res[3]);
+}
+
+async function generateHashes() {
+  const text = document.getElementById('hash-in').value;
+  const container = document.getElementById('hash-results');
+  if(!text) { container.innerHTML = '<div style="color:var(--muted); font-size:0.82rem; padding:0.5rem;">Type something above to see hashes...</div>'; return; }
+  container.innerHTML = '<div style="color:var(--muted); font-size:0.82rem; padding:0.5rem;">Computing...</div>';
+
+  const algos = [
+    {name:'MD5', fn: async () => simpleMD5(text)},
+    {name:'SHA-1', fn: async () => sha('SHA-1', text)},
+    {name:'SHA-256', fn: async () => sha('SHA-256', text)},
+    {name:'SHA-384', fn: async () => sha('SHA-384', text)},
+    {name:'SHA-512', fn: async () => sha('SHA-512', text)},
+  ];
+
+  const results = await Promise.all(algos.map(a => a.fn().then(h => ({name:a.name, hash:h}))));
+  container.innerHTML = results.map(r => `
+    <div class="hash-item">
+      <span class="hash-algo">${r.name}</span>
+      <span class="hash-val">${r.hash}</span>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('${r.hash}')" style="margin-left:auto;flex-shrink:0">copy</button>
+    </div>
+  `).join('');
+}
+
+async function generateHMAC() {
+  const msg = document.getElementById('hmac-msg').value;
+  const key = document.getElementById('hmac-key').value;
+  const algoMap = {'SHA-256':'SHA-256','SHA-384':'SHA-384','SHA-512':'SHA-512','SHA-1':'SHA-1'};
+  const algoName = document.getElementById('hmac-algo').value;
+  try {
+    const enc = new TextEncoder();
+    const keyData = await crypto.subtle.importKey('raw', enc.encode(key), {name:'HMAC',hash:algoMap[algoName]}, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', keyData, enc.encode(msg));
+    const hex = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,'0')).join('');
+    setOut('hmac-out', hex);
+  } catch(e) { setOut('hmac-out', 'Error: ' + e.message); }
+}
+
+// =================== UNIT CONVERTER ===================
+const UNITS = {
+  length: {
+    units: ['meter','kilometer','centimeter','millimeter','micrometer','nanometer','mile','yard','foot','inch','nautical mile','light-year'],
+    toBase: [1, 1000, 0.01, 0.001, 0.000001, 0.000000001, 1609.344, 0.9144, 0.3048, 0.0254, 1852, 9.461e15]
+  },
+  weight: {
+    units: ['kilogram','gram','milligram','pound','ounce','ton (metric)','ton (US)','stone','carat'],
+    toBase: [1, 0.001, 0.000001, 0.453592, 0.0283495, 1000, 907.185, 6.35029, 0.0002]
+  },
+  temperature: {
+    units: ['Celsius','Fahrenheit','Kelvin','Rankine'],
+    toBase: null // special
+  },
+  area: {
+    units: ['sq meter','sq kilometer','sq foot','sq inch','sq yard','sq mile','hectare','acre'],
+    toBase: [1, 1e6, 0.0929, 0.000645, 0.8361, 2.59e6, 10000, 4046.86]
+  },
+  volume: {
+    units: ['liter','milliliter','cubic meter','cubic foot','cubic inch','gallon (US)','quart (US)','pint (US)','cup','tablespoon','teaspoon'],
+    toBase: [1, 0.001, 1000, 28.3168, 0.0163871, 3.78541, 0.946353, 0.473176, 0.236588, 0.0147868, 0.00492892]
+  },
+  speed: {
+    units: ['m/s','km/h','mph','knot','ft/s','Mach'],
+    toBase: [1, 0.277778, 0.44704, 0.514444, 0.3048, 340.3]
+  },
+  data: {
+    units: ['bit','byte','kilobyte','megabyte','gigabyte','terabyte','petabyte','kibibyte','mebibyte','gibibyte'],
+    toBase: [1, 8, 8000, 8e6, 8e9, 8e12, 8e15, 8192, 8388608, 8589934592]
+  },
+  time: {
+    units: ['second','millisecond','microsecond','minute','hour','day','week','month (avg)','year'],
+    toBase: [1, 0.001, 0.000001, 60, 3600, 86400, 604800, 2628000, 31536000]
+  },
+  energy: {
+    units: ['joule','kilojoule','calorie','kilocalorie','watt-hour','kilowatt-hour','electronvolt','BTU','foot-pound'],
+    toBase: [1, 1000, 4.184, 4184, 3600, 3600000, 1.602e-19, 1055.06, 1.35582]
+  },
+  pressure: {
+    units: ['pascal','kilopascal','bar','atmosphere','psi','torr','mmHg'],
+    toBase: [1, 1000, 100000, 101325, 6894.76, 133.322, 133.322]
+  },
+  angle: {
+    units: ['degree','radian','gradian','arcminute','arcsecond','turn'],
+    toBase: [1, 57.2958, 0.9, 1/60, 1/3600, 360]
+  }
 };
 
-// Update this inside your methodSelect event listener
-methodSelect.addEventListener('change', () => {
-    const method = methodSelect.value;
-    // If encoding, show a standard text prompt; if decoding, show a format example
-    inputArea.placeholder = isEncoding ? "Type the text you want to hide..." : placeholders[method];
-    process(); 
-});
-        }
+let currentUnitCat = 'length';
 
-        inputArea.addEventListener('input', process);
-        methodSelect.addEventListener('change', process);
+function setUnitCat(cat, el) {
+  currentUnitCat = cat;
+  document.querySelectorAll('#panel-convert .cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const data = UNITS[cat];
+  const from = document.getElementById('unit-from');
+  const to = document.getElementById('unit-to');
+  from.innerHTML = data.units.map((u,i) => `<option value="${i}">${u}</option>`).join('');
+  to.innerHTML = data.units.map((u,i) => `<option value="${i}">${u}</option>`).join('');
+  to.value = data.units.length > 1 ? 1 : 0;
+  doUnitConvert();
+}
 
-        function clearInput() {
-            inputArea.value = '';
-            process();
-        }
+function tempConvert(val, fromUnit, toUnit) {
+  const units = ['Celsius','Fahrenheit','Kelvin','Rankine'];
+  // to Celsius first
+  let c;
+  if(fromUnit === 0) c = val;
+  else if(fromUnit === 1) c = (val - 32) * 5/9;
+  else if(fromUnit === 2) c = val - 273.15;
+  else c = (val - 491.67) * 5/9;
+  // from Celsius to target
+  if(toUnit === 0) return c;
+  if(toUnit === 1) return c * 9/5 + 32;
+  if(toUnit === 2) return c + 273.15;
+  return (c + 273.15) * 9/5;
+}
 
-        function eggTrigger() {
-            const navMascot = document.getElementById('navMascot');
-            navMascot.innerText = '°ロ°';
-            setTimeout(() => navMascot.innerText = 'ツ', 1000);
-            console.log("Easter egg found! Keep exploring.");
-        }
-    </script>
+function doUnitConvert() {
+  const val = parseFloat(document.getElementById('unit-val').value) || 0;
+  const fi = parseInt(document.getElementById('unit-from').value);
+  const ti = parseInt(document.getElementById('unit-to').value);
+  const data = UNITS[currentUnitCat];
+  let result;
+  if(currentUnitCat === 'temperature') {
+    result = tempConvert(val, fi, ti);
+  } else {
+    const base = val * data.toBase[fi];
+    result = base / data.toBase[ti];
+  }
+  const fmt = Math.abs(result) < 0.001 || Math.abs(result) > 1e9 ? result.toExponential(6) : parseFloat(result.toFixed(8));
+  document.getElementById('unit-result').value = fmt;
+  document.getElementById('unit-formula').textContent = `${val} ${data.units[fi]} = ${fmt} ${data.units[ti]}`;
+  // table
+  const tableEl = document.getElementById('unit-table');
+  if(currentUnitCat === 'temperature') {
+    tableEl.innerHTML = [0,1,2,3].map(i => {
+      const r = tempConvert(val, fi, i);
+      return `<span style="color:var(--accent2)">${data.units[i]}:</span> ${parseFloat(r.toFixed(4))}`;
+    }).join('<br>');
+  } else {
+    tableEl.innerHTML = data.units.map((u,i) => {
+      const r = val * data.toBase[fi] / data.toBase[i];
+      const f = Math.abs(r) < 0.0001 || Math.abs(r) > 1e9 ? r.toExponential(4) : parseFloat(r.toFixed(6));
+      return `<span style="color:var(--accent2)">${u}:</span> ${f}`;
+    }).join('<br>');
+  }
+}
+
+function swapUnits() {
+  const f = document.getElementById('unit-from');
+  const t = document.getElementById('unit-to');
+  [f.value, t.value] = [t.value, f.value];
+  doUnitConvert();
+}
+
+// =================== BASE CONVERT ===================
+function doBaseConvert() {
+  const input = document.getElementById('base-in').value.trim();
+  const fromBase = parseInt(document.getElementById('base-from').value);
+  if(!input) { document.getElementById('base-results').innerHTML = ''; return; }
+  try {
+    const dec = parseInt(input, fromBase);
+    if(isNaN(dec)) { document.getElementById('base-results').innerHTML = '<div style="color:var(--danger)">Invalid number for selected base</div>'; return; }
+    const bases = [
+      {label:'Binary (2)', base:2}, {label:'Octal (8)', base:8},
+      {label:'Decimal (10)', base:10}, {label:'Hex (16)', base:16},
+      {label:'Base 32', base:32}, {label:'Base 36', base:36}
+    ];
+    document.getElementById('base-results').innerHTML = bases.map(b => `
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.75rem">
+        <div style="font-size:0.65rem;color:var(--accent2);font-weight:700;text-transform:uppercase;margin-bottom:0.2rem">${b.label}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:0.82rem;word-break:break-all">${dec.toString(b.base).toUpperCase()}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('base-results').innerHTML = `<div style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+function doArbBase() {
+  const input = document.getElementById('arb-in').value.trim();
+  const from = parseInt(document.getElementById('arb-from').value);
+  const to = parseInt(document.getElementById('arb-to').value);
+  if(!input || isNaN(from) || isNaN(to)) return;
+  try {
+    const dec = parseInt(input, from);
+    setOut('arb-out', isNaN(dec) ? 'Invalid input' : dec.toString(to).toUpperCase());
+  } catch(e) { setOut('arb-out', 'Error'); }
+}
+
+// =================== COLOR TOOLS ===================
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/,'');
+  if(hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+  const n = parseInt(hex, 16);
+  return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+}
+function rgbToHsl(r,g,b) {
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}else{
+    const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;}
+    h/=6;
+  }
+  return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};
+}
+function rgbToHsv(r,g,b) {
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  let h,s=max===0?0:d/max,v=max;
+  if(d===0)h=0;
+  else{switch(max){case r:h=(g-b)/d%6;break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;}h=Math.round(h*60);if(h<0)h+=360;}
+  return {h,s:Math.round(s*100),v:Math.round(v*100)};
+}
+function rgbToHex(r,g,b){return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function hslToHex(h,s,l) {
+  s/=100;l/=100;
+  const a=s*Math.min(l,1-l);
+  const f=n=>{const k=(n+h/30)%12;const color=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*color).toString(16).padStart(2,'0')};
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function onColorPick(hex) {
+  document.getElementById('color-hex-in').value = hex;
+  updateColorConversions(hex);
+}
+function onHexType(hex) {
+  if(/^#[0-9a-fA-F]{6}$/.test(hex)) {
+    document.getElementById('color-picker').value = hex;
+    updateColorConversions(hex);
+  }
+}
+function updateColorConversions(hex) {
+  document.getElementById('color-preview').style.background = hex;
+  const {r,g,b} = hexToRgb(hex);
+  const {h,s,l} = rgbToHsl(r,g,b);
+  const hsv = rgbToHsv(r,g,b);
+  const cmyk_k = 1-Math.max(r,g,b)/255;
+  const cmyk_c = (1-r/255-cmyk_k)/(1-cmyk_k)||0;
+  const cmyk_m = (1-g/255-cmyk_k)/(1-cmyk_k)||0;
+  const cmyk_y = (1-b/255-cmyk_k)/(1-cmyk_k)||0;
+  document.getElementById('color-conversions').innerHTML = [
+    [`HEX`, hex.toUpperCase()],
+    [`RGB`, `rgb(${r}, ${g}, ${b})`],
+    [`HSL`, `hsl(${h}, ${s}%, ${l}%)`],
+    [`HSV`, `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`],
+    [`CMYK`, `cmyk(${Math.round(cmyk_c*100)}%, ${Math.round(cmyk_m*100)}%, ${Math.round(cmyk_y*100)}%, ${Math.round(cmyk_k*100)}%)`],
+    [`Decimal`, `${(r<<16|g<<8|b).toString(10)}`],
+    [`Luminance`, `${(0.2126*r/255 + 0.7152*g/255 + 0.0722*b/255).toFixed(4)}`],
+    [`Alpha 50%`, `rgba(${r}, ${g}, ${b}, 0.5)`],
+  ].map(([k,v]) => `
+    <div style="font-size:0.78rem">
+      <span style="color:var(--accent2)">${k}:</span>
+      <span style="color:var(--text); cursor:pointer" onclick="navigator.clipboard.writeText('${v}')" title="Click to copy">${v}</span>
+    </div>
+  `).join('');
+}
+
+function genPalette() {
+  const baseHex = document.getElementById('pal-color').value;
+  const type = document.getElementById('pal-type').value;
+  const {r,g,b} = hexToRgb(baseHex);
+  const {h,s,l} = rgbToHsl(r,g,b);
+  let colors = [];
+  switch(type) {
+    case 'complementary': colors = [h, (h+180)%360].map(hue => hslToHex(hue,s,l)); break;
+    case 'analogous': colors = [-30,0,30].map(d => hslToHex((h+d+360)%360,s,l)); break;
+    case 'triadic': colors = [0,120,240].map(d => hslToHex((h+d)%360,s,l)); break;
+    case 'split': colors = [0,150,210].map(d => hslToHex((h+d)%360,s,l)); break;
+    case 'tetradic': colors = [0,90,180,270].map(d => hslToHex((h+d)%360,s,l)); break;
+    case 'tints': colors = [80,65,50,35,20].map(lt => hslToHex(h,s,lt)); break;
+    case 'shades': colors = [20,35,50,65,80].map(lt => hslToHex(h,s,lt)); break;
+  }
+  document.getElementById('palette-swatches').innerHTML = colors.map(c => `
+    <div onclick="navigator.clipboard.writeText('${c}')" style="cursor:pointer;flex:1;min-width:60px;height:80px;background:${c};border-radius:10px;display:flex;align-items:flex-end;justify-content:center;padding:0.4rem;transition:transform 0.2s" onmouseenter="this.style.transform='scale(1.05)'" onmouseleave="this.style.transform=''">
+      <span style="font-family:'Space Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.8);background:rgba(0,0,0,0.4);border-radius:4px;padding:0.1rem 0.3rem">${c.toUpperCase()}</span>
+    </div>
+  `).join('');
+}
+
+function checkContrast() {
+  const fg = document.getElementById('fg-color').value;
+  const bg = document.getElementById('bg-color').value;
+  const prev = document.getElementById('contrast-preview');
+  prev.style.background = bg;
+  prev.style.color = fg;
+  const fgRgb = hexToRgb(fg), bgRgb = hexToRgb(bg);
+  function lum(c) {
+    const r = c.r/255, g = c.g/255, b = c.b/255;
+    return 0.2126*(r<.03928?r/12.92:Math.pow((r+.055)/1.055,2.4)) +
+           0.7152*(g<.03928?g/12.92:Math.pow((g+.055)/1.055,2.4)) +
+           0.0722*(b<.03928?b/12.92:Math.pow((b+.055)/1.055,2.4));
+  }
+  const L1 = Math.max(lum(fgRgb), lum(bgRgb));
+  const L2 = Math.min(lum(fgRgb), lum(bgRgb));
+  const ratio = (L1+0.05)/(L2+0.05);
+  const aaSmall = ratio >= 4.5, aaLarge = ratio >= 3, aaaNormal = ratio >= 7, aaaLarge = ratio >= 4.5;
+  document.getElementById('contrast-result').innerHTML = `
+    <div><span style="color:var(--accent2)">Contrast Ratio:</span> <strong style="color:${ratio>=4.5?'var(--success)':ratio>=3?'var(--accent3)':'var(--danger)'}"> ${ratio.toFixed(2)}:1</strong></div>
+    <div><span style="color:var(--muted)">AA (normal text):</span> <span style="color:${aaSmall?'var(--success)':'var(--danger)'}">${aaSmall?'✓ Pass':'✗ Fail'}</span></div>
+    <div><span style="color:var(--muted)">AA (large text):</span> <span style="color:${aaLarge?'var(--success)':'var(--danger)'}">${aaLarge?'✓ Pass':'✗ Fail'}</span></div>
+    <div><span style="color:var(--muted)">AAA (normal):</span> <span style="color:${aaaNormal?'var(--success)':'var(--danger)'}">${aaaNormal?'✓ Pass':'✗ Fail'}</span></div>
+    <div><span style="color:var(--muted)">AAA (large):</span> <span style="color:${aaaLarge?'var(--success)':'var(--danger)'}">${aaaLarge?'✓ Pass':'✗ Fail'}</span></div>
+  `;
+}
+
+const CSS_COLORS = {aliceblue:'#f0f8ff',antiquewhite:'#faebd7',aqua:'#00ffff',aquamarine:'#7fffd4',azure:'#f0ffff',beige:'#f5f5dc',bisque:'#ffe4c4',black:'#000000',blanchedalmond:'#ffebcd',blue:'#0000ff',blueviolet:'#8a2be2',brown:'#a52a2a',burlywood:'#deb887',cadetblue:'#5f9ea0',chartreuse:'#7fff00',chocolate:'#d2691e',coral:'#ff7f50',cornflowerblue:'#6495ed',cornsilk:'#fff8dc',crimson:'#dc143c',cyan:'#00ffff',darkblue:'#00008b',darkcyan:'#008b8b',darkgoldenrod:'#b8860b',darkgray:'#a9a9a9',darkgreen:'#006400',darkkhaki:'#bdb76b',darkmagenta:'#8b008b',darkolivegreen:'#556b2f',darkorange:'#ff8c00',darkorchid:'#9932cc',darkred:'#8b0000',darksalmon:'#e9967a',darkseagreen:'#8fbc8f',darkslateblue:'#483d8b',darkslategray:'#2f4f4f',darkturquoise:'#00ced1',darkviolet:'#9400d3',deeppink:'#ff1493',deepskyblue:'#00bfff',dimgray:'#696969',dodgerblue:'#1e90ff',firebrick:'#b22222',floralwhite:'#fffaf0',forestgreen:'#228b22',fuchsia:'#ff00ff',gainsboro:'#dcdcdc',ghostwhite:'#f8f8ff',gold:'#ffd700',goldenrod:'#daa520',gray:'#808080',green:'#008000',greenyellow:'#adff2f',honeydew:'#f0fff0',hotpink:'#ff69b4',indianred:'#cd5c5c',indigo:'#4b0082',ivory:'#fffff0',khaki:'#f0e68c',lavender:'#e6e6fa',lavenderblush:'#fff0f5',lawngreen:'#7cfc00',lemonchiffon:'#fffacd',lightblue:'#add8e6',lightcoral:'#f08080',lightcyan:'#e0ffff',lightgoldenrodyellow:'#fafad2',lightgray:'#d3d3d3',lightgreen:'#90ee90',lightpink:'#ffb6c1',lightsalmon:'#ffa07a',lightseagreen:'#20b2aa',lightskyblue:'#87cefa',lightslategray:'#778899',lightsteelblue:'#b0c4de',lightyellow:'#ffffe0',lime:'#00ff00',limegreen:'#32cd32',linen:'#faf0e6',magenta:'#ff00ff',maroon:'#800000',mediumaquamarine:'#66cdaa',mediumblue:'#0000cd',mediumorchid:'#ba55d3',mediumpurple:'#9370db',mediumseagreen:'#3cb371',mediumslateblue:'#7b68ee',mediumspringgreen:'#00fa9a',mediumturquoise:'#48d1cc',mediumvioletred:'#c71585',midnightblue:'#191970',mintcream:'#f5fffa',mistyrose:'#ffe4e1',moccasin:'#ffe4b5',navajowhite:'#ffdead',navy:'#000080',oldlace:'#fdf5e6',olive:'#808000',olivedrab:'#6b8e23',orange:'#ffa500',orangered:'#ff4500',orchid:'#da70d6',palegoldenrod:'#eee8aa',palegreen:'#98fb98',paleturquoise:'#afeeee',palevioletred:'#db7093',papayawhip:'#ffefd5',peachpuff:'#ffdab9',peru:'#cd853f',pink:'#ffc0cb',plum:'#dda0dd',powderblue:'#b0e0e6',purple:'#800080',red:'#ff0000',rosybrown:'#bc8f8f',royalblue:'#4169e1',saddlebrown:'#8b4513',salmon:'#fa8072',sandybrown:'#f4a460',seagreen:'#2e8b57',seashell:'#fff5ee',sienna:'#a0522d',silver:'#c0c0c0',skyblue:'#87ceeb',slateblue:'#6a5acd',slategray:'#708090',snow:'#fffafa',springgreen:'#00ff7f',steelblue:'#4682b4',tan:'#d2b48c',teal:'#008080',thistle:'#d8bfd8',tomato:'#ff6347',turquoise:'#40e0d0',violet:'#ee82ee',wheat:'#f5deb3',white:'#ffffff',whitesmoke:'#f5f5f5',yellow:'#ffff00',yellowgreen:'#9acd32'};
+
+function colorDistance(r1,g1,b1,r2,g2,b2){return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2)}
+function findColorName(hex) {
+  document.getElementById('name-hex').value = hex;
+  document.getElementById('name-preview').style.background = hex;
+  const {r,g,b} = hexToRgb(hex);
+  let best = '', bestDist = Infinity;
+  for(const [name, nhex] of Object.entries(CSS_COLORS)) {
+    const nc = hexToRgb(nhex);
+    const d = colorDistance(r,g,b,nc.r,nc.g,nc.b);
+    if(d < bestDist) { bestDist = d; best = name; }
+  }
+  const exact = CSS_COLORS[best] === hex.toLowerCase();
+  document.getElementById('name-result').innerHTML = `
+    <div><span style="color:var(--accent2)">Closest CSS name:</span> <strong style="color:var(--text)">${best}</strong> ${exact?'<span style="color:var(--success)">(exact match)</span>':''}</div>
+    <div style="font-size:0.82rem;color:var(--muted)">CSS value: ${CSS_COLORS[best]} ${!exact?`· Distance: ${Math.round(bestDist)}`:''}
+  `;
+}
+function findColorNameFromText(hex) {
+  if(/^#[0-9a-fA-F]{6}$/.test(hex)) {
+    document.getElementById('name-color').value = hex;
+    findColorName(hex);
+  }
+}
+
+// =================== MISC TOOLS ===================
+function doStats() {
+  const text = document.getElementById('stat-in').value;
+  if(!text) { document.getElementById('stat-out').innerHTML = ''; return; }
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const sentences = (text.match(/[.!?]+/g)||[]).length;
+  const paragraphs = text.split(/\n\s*\n/).filter(p=>p.trim()).length;
+  const freq = {};
+  for(const c of text.toLowerCase()) if(/[a-z]/.test(c)) freq[c] = (freq[c]||0)+1;
+  const topChar = Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('stat-out').innerHTML = [
+    ['Characters', text.length],
+    ['No spaces', text.replace(/\s/g,'').length],
+    ['Words', words],
+    ['Sentences', sentences],
+    ['Paragraphs', Math.max(1,paragraphs)],
+    ['Lines', text.split('\n').length],
+    ['Avg word len', words ? (text.replace(/\s+/g,' ').split(' ').map(w=>w.length).reduce((a,b)=>a+b,0)/words).toFixed(1) : 0],
+    ['Most frequent', topChar ? `'${topChar[0]}' (${topChar[1]}×)` : 'N/A'],
+    ['Unique chars', new Set(text).size],
+    ['Reading time', Math.max(1, Math.round(words/200)) + ' min'],
+  ].map(([k,v]) => `<div><span style="color:var(--accent2)">${k}:</span> <span style="color:var(--text)">${v}</span></div>`).join('');
+}
+
+let randTab = 'password';
+function setRandTab(tab, el) {
+  randTab = tab;
+  document.querySelectorAll('.mini-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['password','uuid','number','bytes'].forEach(t => {
+    const el = document.getElementById(`rand-${t}-opts`);
+    if(el) el.style.display = t === tab ? '' : 'none';
+  });
+}
+
+function generateRandom() {
+  if(randTab === 'password') {
+    const len = parseInt(document.getElementById('rand-len').value);
+    let chars = 'abcdefghijklmnopqrstuvwxyz';
+    if(document.getElementById('rand-upper').checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(document.getElementById('rand-num').checked) chars += '0123456789';
+    if(document.getElementById('rand-sym').checked) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    const arr = new Uint32Array(len);
+    crypto.getRandomValues(arr);
+    setOut('rand-out', Array.from(arr).map(n => chars[n % chars.length]).join(''));
+  } else if(randTab === 'uuid') {
+    const v = document.getElementById('rand-uuid-ver').value;
+    if(v === '4') {
+      const b = new Uint8Array(16);
+      crypto.getRandomValues(b);
+      b[6] = (b[6]&0x0f)|0x40; b[8] = (b[8]&0x3f)|0x80;
+      const hex = Array.from(b).map(x=>x.toString(16).padStart(2,'0'));
+      setOut('rand-out', `${hex.slice(0,4).join('')}-${hex.slice(4,6).join('')}-${hex.slice(6,8).join('')}-${hex.slice(8,10).join('')}-${hex.slice(10).join('')}`);
+    } else {
+      const t = Date.now();
+      const b = new Uint8Array(10);
+      crypto.getRandomValues(b);
+      const hex = Array.from(b).map(x=>x.toString(16).padStart(2,'0'));
+      setOut('rand-out', `${t.toString(16).padStart(8,'0')}-${hex.slice(0,2).join('')}-1${hex[2].slice(0,3)}-${(parseInt(hex[3],16)&0x3f|0x80).toString(16)}${hex[4]}-${hex.slice(5).join('')}`);
+    }
+  } else if(randTab === 'number') {
+    const min = parseInt(document.getElementById('rand-min').value);
+    const max = parseInt(document.getElementById('rand-max').value);
+    const [a,b2] = [Math.min(min,max), Math.max(min,max)];
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    setOut('rand-out', String(a + arr[0] % (b2 - a + 1)));
+  } else {
+    const cnt = parseInt(document.getElementById('rand-byte-cnt').value);
+    const b = new Uint8Array(cnt);
+    crypto.getRandomValues(b);
+    setOut('rand-out', Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join(' '));
+  }
+}
+
+function tsNow() {
+  const ts = Math.floor(Date.now()/1000);
+  document.getElementById('ts-unix').value = ts;
+  tsFromUnix();
+}
+function tsFromUnix() {
+  const ts = parseInt(document.getElementById('ts-unix').value);
+  if(isNaN(ts)) { document.getElementById('ts-results').innerHTML = ''; return; }
+  const d = new Date(ts * 1000);
+  document.getElementById('ts-results').innerHTML = [
+    ['UTC', d.toUTCString()],
+    ['ISO 8601', d.toISOString()],
+    ['Local', d.toLocaleString()],
+    ['Date', d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})],
+    ['Time', d.toLocaleTimeString()],
+    ['Unix ms', ts * 1000],
+  ].map(([k,v]) => `<div><span style="color:var(--accent2)">${k}:</span> ${v}</div>`).join('');
+}
+function tsFromDate() {
+  const v = document.getElementById('ts-dt').value;
+  if(!v) return;
+  setOut('ts-unix-out', Math.floor(new Date(v).getTime()/1000).toString());
+}
+
+function transform(type) {
+  const text = document.getElementById('transform-in').value;
+  const words = text.trim().split(/\s+/);
+  let result;
+  const flipMap = {'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ','f':'ɟ','g':'ƃ','h':'ɥ','i':'ᴉ','j':'ɾ','k':'ʞ','l':'l','m':'ɯ','n':'u','o':'o','p':'d','q':'b','r':'ɹ','s':'s','t':'ʇ','u':'n','v':'ʌ','w':'ʍ','x':'x','y':'ʎ','z':'z'};
+  switch(type) {
+    case 'upper': result = text.toUpperCase(); break;
+    case 'lower': result = text.toLowerCase(); break;
+    case 'title': result = words.map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' '); break;
+    case 'snake': result = text.toLowerCase().replace(/\s+/g,'_'); break;
+    case 'camel': result = words.map((w,i) => i===0?w.toLowerCase():w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(''); break;
+    case 'kebab': result = text.toLowerCase().replace(/\s+/g,'-'); break;
+    case 'pascal': result = words.map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(''); break;
+    case 'reverse': result = text.split('').reverse().join(''); break;
+    case 'flip': result = text.toLowerCase().split('').map(c=>flipMap[c]||c).reverse().join(''); break;
+    case 'trim': result = text.split('\n').map(l=>l.trim()).join('\n').trim(); break;
+    case 'nodups': result = [...new Set(text.split('\n'))].join('\n'); break;
+  }
+  setOut('transform-out', result);
+}
+
+let jsonTab = 'format';
+function setJsonTab(tab, el) {
+  jsonTab = tab;
+  document.querySelectorAll('.card:has(#json-in) .mini-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function doJSON() {
+  const text = document.getElementById('json-in').value;
+  try {
+    const parsed = JSON.parse(text);
+    if(jsonTab === 'format') setOut('json-out', JSON.stringify(parsed, null, 2));
+    else if(jsonTab === 'minify') setOut('json-out', JSON.stringify(parsed));
+    else setOut('json-out', '✓ Valid JSON\n\nKeys: ' + Object.keys(parsed).join(', ') + '\nType: ' + (Array.isArray(parsed)?'Array':'Object'));
+  } catch(e) { setOut('json-out', 'Invalid JSON: ' + e.message); }
+}
+
+function doRegex() {
+  const pattern = document.getElementById('regex-pattern').value;
+  const flags = document.getElementById('regex-flags').value;
+  const text = document.getElementById('regex-in').value;
+  const out = document.getElementById('regex-out');
+  if(!pattern || !text) { out.innerHTML = ''; return; }
+  try {
+    const re = new RegExp(pattern, flags);
+    const matches = [...text.matchAll(new RegExp(pattern, flags.includes('g')?flags:flags+'g'))];
+    const highlighted = text.replace(new RegExp(pattern, flags.includes('g')?flags:flags+'g'),
+      m => `<mark style="background:rgba(0,229,255,0.25);color:var(--text);border-radius:3px;padding:0 2px">${m}</mark>`);
+    out.innerHTML = `<div style="margin-bottom:0.5rem;color:var(--accent2)">${matches.length} match${matches.length!==1?'es':''}</div>`
+      + `<div style="line-height:1.8">${highlighted}</div>`
+      + (matches.length>0?`<div style="margin-top:0.75rem;color:var(--muted)">Groups: ${matches.map((m,i)=>`[${i}] "${m[0]}"`).join(', ')}</div>`:'');
+  } catch(e) { out.innerHTML = `<span style="color:var(--danger)">Invalid regex: ${e.message}</span>`; }
+}
+
+// =================== INIT ===================
+// Initialize unit converter
+setUnitCat('length', document.querySelector('#panel-convert .cat-pill'));
+updateColorConversions('#00e5ff');
+genPalette();
+checkContrast();
+findColorName('#ff6b6b');
+tsNow();
+
+</script>
 </body>
 </html>
