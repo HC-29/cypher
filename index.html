@@ -29,7 +29,6 @@
     overflow-x: hidden;
   }
 
-  /* Animated grid background */
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -41,15 +40,16 @@
     z-index: 0;
   }
 
-  /* Header */
+  /* ===== HEADER ===== */
   header {
     position: sticky; top: 0; z-index: 100;
     background: rgba(10,10,15,0.9);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     padding: 0 2rem;
-    display: flex; align-items: center; gap: 2rem;
+    display: flex; align-items: center; justify-content: space-between;
     height: 64px;
+    gap: 1rem;
   }
   .logo {
     font-family: 'Space Mono', monospace;
@@ -58,9 +58,13 @@
     color: var(--accent);
     letter-spacing: -0.02em;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .logo span { color: var(--muted); }
-  nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+
+  nav {
+    display: flex; gap: 0.25rem; flex-wrap: wrap;
+  }
   nav button {
     background: none; border: none;
     color: var(--muted);
@@ -72,22 +76,74 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
   }
   nav button:hover { color: var(--text); background: var(--surface2); }
   nav button.active { color: var(--accent); background: rgba(0,229,255,0.08); }
 
+  /* Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column; justify-content: center; gap: 5px;
+    width: 40px; height: 40px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer; padding: 9px;
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .hamburger:hover { border-color: var(--accent); }
+  .hamburger span {
+    display: block; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  @media (max-width: 820px) {
+    .hamburger { display: flex; }
+    nav {
+      display: none;
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: rgba(10,10,15,0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.75rem;
+      z-index: 99;
+    }
+    nav.open {
+      display: flex;
+      animation: slideDown 0.22s ease;
+    }
+    nav button {
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      border-radius: 8px;
+    }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* Main layout */
   main { position: relative; z-index: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; }
 
-  /* Section panels */
-  .panel {
-    display: none;
-    animation: fadeIn 0.3s ease;
-  }
+  .panel { display: none; animation: fadeIn 0.3s ease; }
   .panel.active { display: block; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  /* Tool Grid */
   .tool-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -95,7 +151,6 @@
   }
   @media(max-width:900px){ .tool-grid { grid-template-columns: 1fr; } }
 
-  /* Card */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -121,10 +176,8 @@
     font-size: 0.6rem;
   }
 
-  /* Cipher selector */
-  .cipher-select-row {
-    display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
-  }
+  .cipher-select-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
   select, input[type=text], input[type=number], textarea {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -141,15 +194,9 @@
     box-shadow: 0 0 0 3px rgba(0,229,255,0.08);
   }
   select { cursor: pointer; }
-
-  textarea {
-    width: 100%; height: 100px; resize: vertical;
-    line-height: 1.6;
-  }
-
+  textarea { width: 100%; height: 100px; resize: vertical; line-height: 1.6; }
   label { font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 0.3rem; }
 
-  /* Buttons */
   .btn {
     display: inline-flex; align-items: center; gap: 0.4rem;
     padding: 0.5rem 1.2rem;
@@ -167,10 +214,8 @@
   .btn-danger { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
   .btn-danger:hover { background: rgba(239,68,68,0.25); }
   .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.78rem; }
-
   .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
 
-  /* Output box */
   .output {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -196,7 +241,6 @@
   }
   .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
 
-  /* Section heading */
   .section-heading {
     font-size: 2rem; font-weight: 800;
     letter-spacing: -0.03em;
@@ -204,11 +248,8 @@
     background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .section-sub {
-    color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;
-  }
+  .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
 
-  /* Category pills */
   .cat-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .cat-pill {
     padding: 0.35rem 0.9rem; border-radius: 999px;
@@ -224,7 +265,6 @@
     color: var(--accent);
   }
 
-  /* Converter specific */
   .converter-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: end; }
   @media(max-width:600px){ .converter-grid { grid-template-columns: 1fr; } }
   .swap-btn {
@@ -232,11 +272,10 @@
     color: var(--muted); border-radius: 50%;
     width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-size: 1.2rem;
-    transition: all 0.2s; flex-shrink: 0; margin-bottom: 0;
+    transition: all 0.2s; flex-shrink: 0;
   }
   .swap-btn:hover { color: var(--accent); border-color: var(--accent); transform: rotate(180deg); }
 
-  /* Hash display */
   .hash-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
   .hash-item {
     background: var(--bg); border: 1px solid var(--border);
@@ -253,31 +292,10 @@
     word-break: break-all; color: var(--text); flex: 1; line-height: 1.6;
   }
 
-  /* Morse code */
-  .morse-ref {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(60px,1fr));
-    gap: 0.25rem; margin-top: 1rem;
-    max-height: 150px; overflow-y: auto;
-  }
-  .morse-cell {
-    background: var(--surface2); border-radius: 6px;
-    padding: 0.25rem 0.4rem; text-align: center; font-size: 0.72rem;
-  }
-  .morse-cell span:first-child { font-weight: 700; color: var(--accent); }
-
-  /* Color Tools */
-  .color-preview {
-    width: 100%; height: 80px; border-radius: 10px; margin-bottom: 1rem;
-    border: 1px solid var(--border);
-    transition: background 0.3s;
-  }
-
-  /* Number base */
   .base-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   @media(max-width:500px){ .base-grid { grid-template-columns: 1fr; } }
 
-  /* Tabs within card */
-  .mini-tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; }
+  .mini-tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; flex-wrap: wrap; }
   .mini-tab {
     padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
     border: 1px solid transparent; cursor: pointer; background: none;
@@ -285,9 +303,8 @@
   }
   .mini-tab.active { background: rgba(0,229,255,0.1); border-color: rgba(0,229,255,0.3); color: var(--accent); }
 
-  /* Key input */
-  .key-input-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
-  .key-input-row input { flex: 1; }
+  .key-input-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; }
+  .key-input-row input { flex: 1; min-width: 60px; }
   .key-label {
     font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--accent3); white-space: nowrap;
@@ -295,7 +312,6 @@
     border-radius: 5px; padding: 0.4rem 0.6rem;
   }
 
-  /* Status badge */
   .badge {
     display: inline-block; padding: 0.15rem 0.5rem;
     border-radius: 4px; font-size: 0.65rem; font-weight: 700;
@@ -305,13 +321,11 @@
   .badge-modern { background: rgba(0,229,255,0.1); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
   .badge-hash { background: rgba(245,158,11,0.1); color: var(--accent3); border: 1px solid rgba(245,158,11,0.2); }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
-  /* Toast */
   #toast {
     position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
     background: var(--success); color: #000;
@@ -321,6 +335,11 @@
     transition: all 0.3s;
   }
   #toast.show { transform: translateY(0); opacity: 1; }
+
+  .color-preview {
+    width: 100%; height: 80px; border-radius: 10px; margin-bottom: 1rem;
+    border: 1px solid var(--border); transition: background 0.3s;
+  }
 
   input[type=color] {
     width: 48px; height: 38px; padding: 2px;
@@ -334,7 +353,7 @@
 
 <header>
   <div class="logo">CRYPTO<span>TOOLS</span></div>
-  <nav>
+  <nav id="main-nav">
     <button class="active" onclick="showPanel('encode')">Encode/Decode</button>
     <button onclick="showPanel('hash')">Hash</button>
     <button onclick="showPanel('convert')">Unit Converter</button>
@@ -342,6 +361,9 @@
     <button onclick="showPanel('color')">Color Tools</button>
     <button onclick="showPanel('misc')">Misc Tools</button>
   </nav>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <main>
@@ -652,6 +674,57 @@
       <div class="output" id="baudot-out"><button class="copy-btn" onclick="copyOut('baudot-out')">copy</button></div>
     </div>
 
+    <!-- ROT47 — NEW -->
+    <div class="card" data-cat="classic substitution">
+      <div class="card-title">ROT47 <span class="badge badge-classic">Classical</span></div>
+      <label>Input Text (rotates all printable ASCII)</label>
+      <textarea id="rot47-in" placeholder="Enter text..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="doRot47()">Apply ROT47</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('rot47-in','rot47-out')">Clear</button>
+      </div>
+      <div class="output" id="rot47-out"><button class="copy-btn" onclick="copyOut('rot47-out')">copy</button></div>
+    </div>
+
+    <!-- ASCII85 — NEW -->
+    <div class="card" data-cat="modern">
+      <div class="card-title">ASCII85 / Base85 <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="a85-in" placeholder="Enter text or ASCII85 encoded string..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="a85Do(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="a85Do(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('a85-in','a85-out')">Clear</button>
+      </div>
+      <div class="output" id="a85-out"><button class="copy-btn" onclick="copyOut('a85-out')">copy</button></div>
+    </div>
+
+    <!-- Unicode Escape — NEW -->
+    <div class="card" data-cat="modern">
+      <div class="card-title">Unicode Escape <span class="badge badge-modern">Encoding</span></div>
+      <label>Input Text</label>
+      <textarea id="uni-in" placeholder="Enter text or \\uXXXX escape sequences..."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="uniDo(true)">Encode</button>
+        <button class="btn btn-secondary btn-sm" onclick="uniDo(false)">Decode</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('uni-in','uni-out')">Clear</button>
+      </div>
+      <div class="output" id="uni-out"><button class="copy-btn" onclick="copyOut('uni-out')">copy</button></div>
+    </div>
+
+    <!-- Tap Code — NEW -->
+    <div class="card" data-cat="code classic">
+      <div class="card-title">Tap Code <span class="badge badge-classic">Code</span></div>
+      <label>Input Text (used by POWs)</label>
+      <textarea id="tap-in" placeholder="Enter text or tap code (e.g. 1-3 2-4 ...)"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="tapDo(true)">To Tap Code</button>
+        <button class="btn btn-secondary btn-sm" onclick="tapDo(false)">From Tap Code</button>
+        <button class="btn btn-danger btn-sm" onclick="clear2('tap-in','tap-out')">Clear</button>
+      </div>
+      <div class="output" id="tap-out"><button class="copy-btn" onclick="copyOut('tap-out')">copy</button></div>
+    </div>
+
   </div>
 </div>
 
@@ -686,6 +759,29 @@
       <button class="btn btn-primary btn-sm" onclick="generateHMAC()">Generate HMAC</button>
     </div>
     <div class="output" id="hmac-out"><button class="copy-btn" onclick="copyOut('hmac-out')">copy</button></div>
+  </div>
+
+  <!-- Hash Compare — NEW -->
+  <br>
+  <div class="card" style="max-width:800px">
+    <div class="card-title">Hash Comparison <span class="badge badge-hash">Verify</span></div>
+    <label>Input Text</label>
+    <textarea id="hcmp-in" placeholder="Enter original text..." style="height:60px"></textarea>
+    <label style="margin-top:0.75rem">Expected Hash</label>
+    <input type="text" id="hcmp-expected" placeholder="Paste hash to compare against..." style="width:100%">
+    <div class="key-input-row" style="margin-top:0.75rem">
+      <span class="key-label">Algo</span>
+      <select id="hcmp-algo">
+        <option>MD5</option>
+        <option selected>SHA-256</option>
+        <option>SHA-512</option>
+        <option>SHA-1</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm" onclick="compareHash()">Compare</button>
+    </div>
+    <div class="output" id="hcmp-out"><button class="copy-btn" onclick="copyOut('hcmp-out')">copy</button></div>
   </div>
 </div>
 
@@ -726,7 +822,6 @@
   </div>
 
   <br>
-  <!-- Quick reference table -->
   <div class="card" style="max-width:700px">
     <div class="card-title">All Conversions at a Glance</div>
     <div id="unit-table" style="font-family:'Space Mono',monospace; font-size:0.8rem; line-height:2; color:var(--muted)"></div>
@@ -774,6 +869,23 @@
       </div>
     </div>
     <div class="output" id="arb-out" style="margin-top:0.75rem"><button class="copy-btn" onclick="copyOut('arb-out')">copy</button></div>
+  </div>
+
+  <!-- Bitwise Calculator — NEW -->
+  <br>
+  <div class="card" style="max-width:700px">
+    <div class="card-title">Bitwise Calculator</div>
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:end; margin-bottom:0.75rem">
+      <div>
+        <label>A (decimal)</label>
+        <input type="number" id="bit-a" value="42" style="width:110px" oninput="doBitwise()">
+      </div>
+      <div>
+        <label>B (decimal)</label>
+        <input type="number" id="bit-b" value="27" style="width:110px" oninput="doBitwise()">
+      </div>
+    </div>
+    <div id="bitwise-results" style="font-family:'Space Mono',monospace; font-size:0.82rem; line-height:2.2; color:var(--muted)"></div>
   </div>
 </div>
 
@@ -833,6 +945,58 @@
       <div class="color-preview" id="name-preview" style="background:#ff6b6b; height:60px"></div>
       <div id="name-result" style="margin-top:0.75rem; font-size:0.9rem; line-height:1.8"></div>
     </div>
+
+    <!-- Gradient Generator — NEW -->
+    <div class="card">
+      <div class="card-title">Gradient Generator <span class="badge badge-modern">CSS</span></div>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; margin-bottom:0.75rem">
+        <div><label>Color 1</label><input type="color" id="grad-c1" value="#00e5ff" oninput="genGradient()"></div>
+        <div><label>Color 2</label><input type="color" id="grad-c2" value="#7c3aed" oninput="genGradient()"></div>
+        <div>
+          <label>Type</label>
+          <select id="grad-type" onchange="genGradient()">
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+            <option value="conic">Conic</option>
+          </select>
+        </div>
+        <div>
+          <label>Angle</label>
+          <input type="number" id="grad-angle" value="135" min="0" max="360" style="width:75px" oninput="genGradient()">
+        </div>
+      </div>
+      <div id="grad-preview" style="width:100%; height:100px; border-radius:10px; margin-bottom:0.75rem; border:1px solid var(--border)"></div>
+      <div class="output" id="grad-out" style="margin-top:0"><button class="copy-btn" onclick="copyOut('grad-out')">copy</button></div>
+    </div>
+
+    <!-- RGB Mixer — NEW -->
+    <div class="card">
+      <div class="card-title">RGB / HSL Mixer <span class="badge badge-modern">Interactive</span></div>
+      <div style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <span style="font-size:0.72rem; color:var(--danger); font-weight:700; width:14px">R</span>
+          <input type="range" id="mix-r" min="0" max="255" value="0" style="flex:1; accent-color:var(--danger)" oninput="updateMixer()">
+          <span id="mix-r-val" style="font-family:'Space Mono',monospace; font-size:0.78rem; width:30px; text-align:right">0</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <span style="font-size:0.72rem; color:var(--success); font-weight:700; width:14px">G</span>
+          <input type="range" id="mix-g" min="0" max="255" value="229" style="flex:1; accent-color:var(--success)" oninput="updateMixer()">
+          <span id="mix-g-val" style="font-family:'Space Mono',monospace; font-size:0.78rem; width:30px; text-align:right">229</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <span style="font-size:0.72rem; color:var(--accent); font-weight:700; width:14px">B</span>
+          <input type="range" id="mix-b" min="0" max="255" value="255" style="flex:1; accent-color:var(--accent)" oninput="updateMixer()">
+          <span id="mix-b-val" style="font-family:'Space Mono',monospace; font-size:0.78rem; width:30px; text-align:right">255</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <span style="font-size:0.72rem; color:var(--muted); font-weight:700; width:14px">A</span>
+          <input type="range" id="mix-a" min="0" max="100" value="100" style="flex:1" oninput="updateMixer()">
+          <span id="mix-a-val" style="font-family:'Space Mono',monospace; font-size:0.78rem; width:30px; text-align:right">100%</span>
+        </div>
+      </div>
+      <div id="mix-preview" style="width:100%; height:60px; border-radius:8px; border:1px solid var(--border); margin-bottom:0.5rem; background: repeating-conic-gradient(#333 0% 25%, #555 0% 50%) 0 0 / 12px 12px;"></div>
+      <div id="mix-result" style="font-family:'Space Mono',monospace; font-size:0.8rem; line-height:2; color:var(--muted)"></div>
+    </div>
   </div>
 </div>
 
@@ -860,7 +1024,7 @@
       <div id="rand-password-opts">
         <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem">
           <div><label>Length</label><input type="number" id="rand-len" value="16" min="4" max="128" style="width:80px"></div>
-          <div style="display:flex; align-items:end; gap:0.5rem; padding-bottom:0.1rem">
+          <div style="display:flex; align-items:end; gap:0.5rem; padding-bottom:0.1rem; flex-wrap:wrap">
             <label style="display:flex;align-items:center;gap:0.3rem;color:var(--text)"><input type="checkbox" id="rand-upper" checked> Uppercase</label>
             <label style="display:flex;align-items:center;gap:0.3rem;color:var(--text)"><input type="checkbox" id="rand-num" checked> Numbers</label>
             <label style="display:flex;align-items:center;gap:0.3rem;color:var(--text)"><input type="checkbox" id="rand-sym" checked> Symbols</label>
@@ -887,7 +1051,7 @@
     <div class="card">
       <div class="card-title">Timestamp Converter</div>
       <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap">
-        <input type="number" id="ts-unix" placeholder="Unix timestamp" style="flex:1" oninput="tsFromUnix()">
+        <input type="number" id="ts-unix" placeholder="Unix timestamp" style="flex:1; min-width:120px" oninput="tsFromUnix()">
         <button class="btn btn-secondary btn-sm" onclick="tsNow()">Now</button>
       </div>
       <div id="ts-results" style="font-family:'Space Mono',monospace; font-size:0.8rem; line-height:2.2; color:var(--muted)"></div>
@@ -944,20 +1108,85 @@
       <div id="regex-out" style="margin-top:0.75rem; font-size:0.82rem; line-height:1.8; font-family:'Space Mono',monospace"></div>
     </div>
 
+    <!-- Lorem Ipsum Generator — NEW -->
+    <div class="card">
+      <div class="card-title">Lorem Ipsum Generator <span class="badge badge-modern">Text</span></div>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem; align-items:end">
+        <div>
+          <label>Count</label>
+          <input type="number" id="lorem-count" value="3" min="1" max="20" style="width:80px">
+        </div>
+        <div>
+          <label>Type</label>
+          <select id="lorem-type">
+            <option value="paragraphs">Paragraphs</option>
+            <option value="sentences">Sentences</option>
+            <option value="words">Words</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="genLorem()" style="margin-bottom:0">Generate</button>
+      </div>
+      <div class="output" id="lorem-out" style="height:140px; overflow:auto"><button class="copy-btn" onclick="copyOut('lorem-out')">copy</button></div>
+    </div>
+
+    <!-- Diff Checker — NEW -->
+    <div class="card">
+      <div class="card-title">Text Diff Checker <span class="badge badge-modern">Compare</span></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem">
+        <div>
+          <label>Original</label>
+          <textarea id="diff-a" placeholder="Original text..." style="height:100px"></textarea>
+        </div>
+        <div>
+          <label>Modified</label>
+          <textarea id="diff-b" placeholder="Modified text..." style="height:100px"></textarea>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="doDiff()">Compare</button>
+      <div id="diff-out" style="margin-top:0.75rem; font-family:'Space Mono',monospace; font-size:0.8rem; line-height:1.8; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.75rem; min-height:60px; white-space:pre-wrap; word-break:break-all"></div>
+    </div>
+
+    <!-- Cron Expression Parser — NEW -->
+    <div class="card">
+      <div class="card-title">Cron Expression Parser <span class="badge badge-modern">Scheduler</span></div>
+      <label>Cron Expression</label>
+      <input type="text" id="cron-in" value="0 9 * * 1-5" placeholder="* * * * *" style="width:100%; margin-bottom:0.75rem" oninput="parseCron()">
+      <div id="cron-out" style="font-family:'Space Mono',monospace; font-size:0.82rem; line-height:2; color:var(--muted)"></div>
+      <div style="margin-top:0.75rem; font-size:0.75rem; color:var(--muted)">Format: <span style="color:var(--accent2)">minute hour day month weekday</span></div>
+    </div>
+
   </div>
 </div>
 
 </main>
 
 <script>
-// =================== NAV ===================
+// =================== NAV + HAMBURGER ===================
+function toggleNav() {
+  const nav = document.getElementById('main-nav');
+  const btn = document.getElementById('hamburger');
+  nav.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const nav = document.getElementById('main-nav');
+  const btn = document.getElementById('hamburger');
+  if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+    nav.classList.remove('open');
+    btn.classList.remove('open');
+  }
+});
+
 function showPanel(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
-  document.querySelectorAll('nav button').forEach((b,i) => b.classList.remove('active'));
-  const btns = document.querySelectorAll('nav button');
   const map = {encode:0,hash:1,convert:2,base:3,color:4,misc:5};
-  btns[map[id]].classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('nav button')[map[id]].classList.add('active');
+  // Close hamburger menu after selection
+  document.getElementById('main-nav').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
 }
 
 // =================== UTILS ===================
@@ -1012,6 +1241,86 @@ function doRot13() {
     const base = c >= 'a' ? 97 : 65;
     return String.fromCharCode(((c.charCodeAt(0) - base + 13) % 26) + base);
   }));
+}
+
+// =================== ROT47 (NEW) ===================
+function doRot47() {
+  const text = document.getElementById('rot47-in').value;
+  setOut('rot47-out', text.replace(/[!-~]/g, c => {
+    return String.fromCharCode(((c.charCodeAt(0) - 33 + 47) % 94) + 33);
+  }));
+}
+
+// =================== ASCII85 (NEW) ===================
+function a85Do(encode) {
+  const text = document.getElementById('a85-in').value;
+  if(encode) {
+    let result = '<~';
+    const bytes = new TextEncoder().encode(text);
+    for(let i = 0; i < bytes.length; i += 4) {
+      let b = 0;
+      const chunk = bytes.slice(i, i+4);
+      const pad = 4 - chunk.length;
+      for(let j = 0; j < 4; j++) b = b * 256 + (chunk[j] || 0);
+      if(b === 0 && pad === 0) { result += 'z'; continue; }
+      let group = '';
+      for(let j = 4; j >= 0; j--) { group = String.fromCharCode((b % 85) + 33) + group; b = Math.floor(b/85); }
+      result += group.slice(0, 5 - pad);
+    }
+    setOut('a85-out', result + '~>');
+  } else {
+    try {
+      const clean = text.replace(/^<~/,'').replace(/~>$/,'').replace(/\s/g,'').replace(/z/g,'!!!!!');
+      let result = '';
+      for(let i = 0; i < clean.length; i += 5) {
+        const chunk = clean.slice(i, i+5);
+        const pad = 5 - chunk.length;
+        let b = 0;
+        for(const c of chunk.padEnd(5,'u')) b = b * 85 + (c.charCodeAt(0) - 33);
+        for(let j = 3; j >= 0; j--) { if(j < 4 - pad) result += String.fromCharCode((b >> (j*8)) & 255); }
+      }
+      setOut('a85-out', result);
+    } catch(e) { setOut('a85-out', 'Error: invalid ASCII85'); }
+  }
+}
+
+// =================== UNICODE ESCAPE (NEW) ===================
+function uniDo(encode) {
+  const text = document.getElementById('uni-in').value;
+  if(encode) {
+    setOut('uni-out', Array.from(text).map(c => {
+      const cp = c.codePointAt(0);
+      return cp > 127 ? `\\u${cp.toString(16).padStart(4,'0').toUpperCase()}` : c;
+    }).join(''));
+  } else {
+    try {
+      setOut('uni-out', text.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCodePoint(parseInt(h,16))));
+    } catch(e) { setOut('uni-out', 'Error decoding'); }
+  }
+}
+
+// =================== TAP CODE (NEW) ===================
+const TAP_SQ = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'; // I=J, 5x5
+function tapDo(encode) {
+  const text = document.getElementById('tap-in').value;
+  if(encode) {
+    const result = text.toUpperCase().replace(/J/g,'I').split('').map(c => {
+      const i = TAP_SQ.indexOf(c);
+      if(i < 0) return c === ' ' ? '  ' : '';
+      return `${Math.floor(i/5)+1}-${(i%5)+1}`;
+    }).filter(Boolean).join(' ');
+    setOut('tap-out', result);
+  } else {
+    const result = text.trim().split(/\s{2,}|\n/).map(word =>
+      word.trim().split(/\s+/).map(code => {
+        const parts = code.split('-');
+        if(parts.length !== 2) return '';
+        const r = parseInt(parts[0])-1, c = parseInt(parts[1])-1;
+        return TAP_SQ[r*5+c] || '?';
+      }).join('')
+    ).join(' ');
+    setOut('tap-out', result);
+  }
 }
 
 // =================== VIGENÈRE ===================
@@ -1107,13 +1416,11 @@ function columnarDo(encode) {
     }
     setOut('col-out', order.map(c => grid.map(r => r[c]).join('')).join(' '));
   } else {
-    const colLens = order.map((c,i) => rows - (i >= text.length % cols && text.length % cols !== 0 ? 1 : 0));
     const colData = {};
     let pos = 0;
-    order.forEach((origCol, sortIdx) => {
-      const len = rows;
-      colData[origCol] = text.replace(/\s/g,'').substr(pos, len);
-      pos += len;
+    order.forEach((origCol) => {
+      colData[origCol] = text.replace(/\s/g,'').substr(pos, rows);
+      pos += rows;
     });
     let result = '';
     for(let r = 0; r < rows; r++)
@@ -1148,7 +1455,7 @@ function baconDo(encode) {
 // =================== POLYBIUS ===================
 function polybiusDo(encode) {
   const text = document.getElementById('polybius-in').value;
-  const sq = 'ABCDEFGHIKLMNOPQRSTUVWXYZ'; // I=J
+  const sq = 'ABCDEFGHIKLMNOPQRSTUVWXYZ';
   if(encode) {
     setOut('polybius-out', text.toUpperCase().replace(/J/g,'I').replace(/[A-Z]/g, c => {
       const i = sq.indexOf(c);
@@ -1181,7 +1488,6 @@ function playfairDo(encode) {
   const mat = makePlayfairMatrix(key);
   const pos = {};
   mat.forEach((c,i) => { pos[c] = {r:Math.floor(i/5), c:i%5}; });
-  // prepare digraphs
   let pairs = [];
   let i = 0;
   while(i < text.length) {
@@ -1349,7 +1655,6 @@ async function sha(algorithm, message) {
 }
 
 function simpleMD5(str) {
-  // Simple MD5 implementation
   function safeAdd(x,y){const lsw=(x&0xFFFF)+(y&0xFFFF),msw=Math.floor(x/65536)+Math.floor(y/65536)+(lsw>>16);return Math.floor(msw/65536)*4294967296+(msw&0xFFFF)*65536+(lsw&0xFFFF)}
   function bitRotateLeft(num,cnt){return(num<<cnt)|(num>>>(32-cnt))}
   function md5cmn(q,a,b,x,s,t){return safeAdd(bitRotateLeft(safeAdd(safeAdd(a,q),safeAdd(x,t)),s),b)}
@@ -1369,7 +1674,6 @@ async function generateHashes() {
   const container = document.getElementById('hash-results');
   if(!text) { container.innerHTML = '<div style="color:var(--muted); font-size:0.82rem; padding:0.5rem;">Type something above to see hashes...</div>'; return; }
   container.innerHTML = '<div style="color:var(--muted); font-size:0.82rem; padding:0.5rem;">Computing...</div>';
-
   const algos = [
     {name:'MD5', fn: async () => simpleMD5(text)},
     {name:'SHA-1', fn: async () => sha('SHA-1', text)},
@@ -1377,7 +1681,6 @@ async function generateHashes() {
     {name:'SHA-384', fn: async () => sha('SHA-384', text)},
     {name:'SHA-512', fn: async () => sha('SHA-512', text)},
   ];
-
   const results = await Promise.all(algos.map(a => a.fn().then(h => ({name:a.name, hash:h}))));
   container.innerHTML = results.map(r => `
     <div class="hash-item">
@@ -1402,6 +1705,19 @@ async function generateHMAC() {
   } catch(e) { setOut('hmac-out', 'Error: ' + e.message); }
 }
 
+// =================== HASH COMPARE (NEW) ===================
+async function compareHash() {
+  const text = document.getElementById('hcmp-in').value;
+  const expected = document.getElementById('hcmp-expected').value.trim().toLowerCase();
+  const algo = document.getElementById('hcmp-algo').value;
+  if(!text || !expected) { setOut('hcmp-out', 'Please enter both text and expected hash'); return; }
+  let computed;
+  if(algo === 'MD5') computed = simpleMD5(text);
+  else computed = await sha(algo === 'SHA-256' ? 'SHA-256' : algo === 'SHA-512' ? 'SHA-512' : 'SHA-1', text);
+  const match = computed.toLowerCase() === expected;
+  setOut('hcmp-out', `Computed:  ${computed}\nExpected:  ${expected}\n\nResult: ${match ? '✓ MATCH — hashes are identical' : '✗ MISMATCH — hashes differ'}`);
+}
+
 // =================== UNIT CONVERTER ===================
 const UNITS = {
   length: {
@@ -1412,10 +1728,7 @@ const UNITS = {
     units: ['kilogram','gram','milligram','pound','ounce','ton (metric)','ton (US)','stone','carat'],
     toBase: [1, 0.001, 0.000001, 0.453592, 0.0283495, 1000, 907.185, 6.35029, 0.0002]
   },
-  temperature: {
-    units: ['Celsius','Fahrenheit','Kelvin','Rankine'],
-    toBase: null // special
-  },
+  temperature: { units: ['Celsius','Fahrenheit','Kelvin','Rankine'], toBase: null },
   area: {
     units: ['sq meter','sq kilometer','sq foot','sq inch','sq yard','sq mile','hectare','acre'],
     toBase: [1, 1e6, 0.0929, 0.000645, 0.8361, 2.59e6, 10000, 4046.86]
@@ -1466,14 +1779,11 @@ function setUnitCat(cat, el) {
 }
 
 function tempConvert(val, fromUnit, toUnit) {
-  const units = ['Celsius','Fahrenheit','Kelvin','Rankine'];
-  // to Celsius first
   let c;
   if(fromUnit === 0) c = val;
   else if(fromUnit === 1) c = (val - 32) * 5/9;
   else if(fromUnit === 2) c = val - 273.15;
   else c = (val - 491.67) * 5/9;
-  // from Celsius to target
   if(toUnit === 0) return c;
   if(toUnit === 1) return c * 9/5 + 32;
   if(toUnit === 2) return c + 273.15;
@@ -1495,7 +1805,6 @@ function doUnitConvert() {
   const fmt = Math.abs(result) < 0.001 || Math.abs(result) > 1e9 ? result.toExponential(6) : parseFloat(result.toFixed(8));
   document.getElementById('unit-result').value = fmt;
   document.getElementById('unit-formula').textContent = `${val} ${data.units[fi]} = ${fmt} ${data.units[ti]}`;
-  // table
   const tableEl = document.getElementById('unit-table');
   if(currentUnitCat === 'temperature') {
     tableEl.innerHTML = [0,1,2,3].map(i => {
@@ -1553,6 +1862,24 @@ function doArbBase() {
   } catch(e) { setOut('arb-out', 'Error'); }
 }
 
+// =================== BITWISE (NEW) ===================
+function doBitwise() {
+  const a = parseInt(document.getElementById('bit-a').value) || 0;
+  const b = parseInt(document.getElementById('bit-b').value) || 0;
+  document.getElementById('bitwise-results').innerHTML = [
+    ['A', `${a}`, `${a.toString(2).padStart(8,'0')}`, `0x${(a>>>0).toString(16).toUpperCase()}`],
+    ['B', `${b}`, `${b.toString(2).padStart(8,'0')}`, `0x${(b>>>0).toString(16).toUpperCase()}`],
+    ['A AND B', `${a & b}`, `${(a&b).toString(2).padStart(8,'0')}`, `0x${((a&b)>>>0).toString(16).toUpperCase()}`],
+    ['A OR B',  `${a | b}`, `${(a|b).toString(2).padStart(8,'0')}`, `0x${((a|b)>>>0).toString(16).toUpperCase()}`],
+    ['A XOR B', `${a ^ b}`, `${(a^b).toString(2).padStart(8,'0')}`, `0x${((a^b)>>>0).toString(16).toUpperCase()}`],
+    ['NOT A',   `${~a}`,    `${(~a>>>0).toString(2).padStart(8,'0')}`, `0x${((~a)>>>0).toString(16).toUpperCase()}`],
+    ['A << 1',  `${a << 1}`, `${((a<<1)>>>0).toString(2).padStart(8,'0')}`, `0x${((a<<1)>>>0).toString(16).toUpperCase()}`],
+    ['A >> 1',  `${a >> 1}`, `${(a>>1).toString(2).padStart(8,'0')}`, `0x${((a>>1)>>>0).toString(16).toUpperCase()}`],
+  ].map(([op,dec,bin,hex]) =>
+    `<div><span style="color:var(--accent2); min-width:90px; display:inline-block">${op}:</span> <span style="color:var(--text)">${dec}</span> <span style="color:var(--muted); margin-left:0.75rem">${bin}</span> <span style="color:var(--accent3); margin-left:0.75rem">${hex}</span></div>`
+  ).join('');
+}
+
 // =================== COLOR TOOLS ===================
 function hexToRgb(hex) {
   hex = hex.replace(/^#/,'');
@@ -1579,7 +1906,6 @@ function rgbToHsv(r,g,b) {
   else{switch(max){case r:h=(g-b)/d%6;break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;}h=Math.round(h*60);if(h<0)h+=360;}
   return {h,s:Math.round(s*100),v:Math.round(v*100)};
 }
-function rgbToHex(r,g,b){return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
 function hslToHex(h,s,l) {
   s/=100;l/=100;
   const a=s*Math.min(l,1-l);
@@ -1671,6 +1997,42 @@ function checkContrast() {
   `;
 }
 
+// =================== GRADIENT GENERATOR (NEW) ===================
+function genGradient() {
+  const c1 = document.getElementById('grad-c1').value;
+  const c2 = document.getElementById('grad-c2').value;
+  const type = document.getElementById('grad-type').value;
+  const angle = document.getElementById('grad-angle').value;
+  let css;
+  if(type === 'linear') css = `linear-gradient(${angle}deg, ${c1}, ${c2})`;
+  else if(type === 'radial') css = `radial-gradient(circle, ${c1}, ${c2})`;
+  else css = `conic-gradient(from ${angle}deg, ${c1}, ${c2}, ${c1})`;
+  document.getElementById('grad-preview').style.background = css;
+  setOut('grad-out', `background: ${css};`);
+}
+
+// =================== RGB MIXER (NEW) ===================
+function updateMixer() {
+  const r = parseInt(document.getElementById('mix-r').value);
+  const g = parseInt(document.getElementById('mix-g').value);
+  const b = parseInt(document.getElementById('mix-b').value);
+  const a = parseInt(document.getElementById('mix-a').value);
+  document.getElementById('mix-r-val').textContent = r;
+  document.getElementById('mix-g-val').textContent = g;
+  document.getElementById('mix-b-val').textContent = b;
+  document.getElementById('mix-a-val').textContent = a + '%';
+  const alpha = (a/100).toFixed(2);
+  const hex = '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+  const hsl = rgbToHsl(r,g,b);
+  document.getElementById('mix-preview').style.background = `rgba(${r},${g},${b},${alpha})`;
+  document.getElementById('mix-result').innerHTML = `
+    <div><span style="color:var(--accent2)">HEX:</span> ${hex.toUpperCase()} <span style="cursor:pointer;color:var(--muted)" onclick="navigator.clipboard.writeText('${hex.toUpperCase()}')">⎘</span></div>
+    <div><span style="color:var(--accent2)">RGB:</span> rgb(${r}, ${g}, ${b})</div>
+    <div><span style="color:var(--accent2)">RGBA:</span> rgba(${r}, ${g}, ${b}, ${alpha})</div>
+    <div><span style="color:var(--accent2)">HSL:</span> hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)</div>
+  `;
+}
+
 const CSS_COLORS = {aliceblue:'#f0f8ff',antiquewhite:'#faebd7',aqua:'#00ffff',aquamarine:'#7fffd4',azure:'#f0ffff',beige:'#f5f5dc',bisque:'#ffe4c4',black:'#000000',blanchedalmond:'#ffebcd',blue:'#0000ff',blueviolet:'#8a2be2',brown:'#a52a2a',burlywood:'#deb887',cadetblue:'#5f9ea0',chartreuse:'#7fff00',chocolate:'#d2691e',coral:'#ff7f50',cornflowerblue:'#6495ed',cornsilk:'#fff8dc',crimson:'#dc143c',cyan:'#00ffff',darkblue:'#00008b',darkcyan:'#008b8b',darkgoldenrod:'#b8860b',darkgray:'#a9a9a9',darkgreen:'#006400',darkkhaki:'#bdb76b',darkmagenta:'#8b008b',darkolivegreen:'#556b2f',darkorange:'#ff8c00',darkorchid:'#9932cc',darkred:'#8b0000',darksalmon:'#e9967a',darkseagreen:'#8fbc8f',darkslateblue:'#483d8b',darkslategray:'#2f4f4f',darkturquoise:'#00ced1',darkviolet:'#9400d3',deeppink:'#ff1493',deepskyblue:'#00bfff',dimgray:'#696969',dodgerblue:'#1e90ff',firebrick:'#b22222',floralwhite:'#fffaf0',forestgreen:'#228b22',fuchsia:'#ff00ff',gainsboro:'#dcdcdc',ghostwhite:'#f8f8ff',gold:'#ffd700',goldenrod:'#daa520',gray:'#808080',green:'#008000',greenyellow:'#adff2f',honeydew:'#f0fff0',hotpink:'#ff69b4',indianred:'#cd5c5c',indigo:'#4b0082',ivory:'#fffff0',khaki:'#f0e68c',lavender:'#e6e6fa',lavenderblush:'#fff0f5',lawngreen:'#7cfc00',lemonchiffon:'#fffacd',lightblue:'#add8e6',lightcoral:'#f08080',lightcyan:'#e0ffff',lightgoldenrodyellow:'#fafad2',lightgray:'#d3d3d3',lightgreen:'#90ee90',lightpink:'#ffb6c1',lightsalmon:'#ffa07a',lightseagreen:'#20b2aa',lightskyblue:'#87cefa',lightslategray:'#778899',lightsteelblue:'#b0c4de',lightyellow:'#ffffe0',lime:'#00ff00',limegreen:'#32cd32',linen:'#faf0e6',magenta:'#ff00ff',maroon:'#800000',mediumaquamarine:'#66cdaa',mediumblue:'#0000cd',mediumorchid:'#ba55d3',mediumpurple:'#9370db',mediumseagreen:'#3cb371',mediumslateblue:'#7b68ee',mediumspringgreen:'#00fa9a',mediumturquoise:'#48d1cc',mediumvioletred:'#c71585',midnightblue:'#191970',mintcream:'#f5fffa',mistyrose:'#ffe4e1',moccasin:'#ffe4b5',navajowhite:'#ffdead',navy:'#000080',oldlace:'#fdf5e6',olive:'#808000',olivedrab:'#6b8e23',orange:'#ffa500',orangered:'#ff4500',orchid:'#da70d6',palegoldenrod:'#eee8aa',palegreen:'#98fb98',paleturquoise:'#afeeee',palevioletred:'#db7093',papayawhip:'#ffefd5',peachpuff:'#ffdab9',peru:'#cd853f',pink:'#ffc0cb',plum:'#dda0dd',powderblue:'#b0e0e6',purple:'#800080',red:'#ff0000',rosybrown:'#bc8f8f',royalblue:'#4169e1',saddlebrown:'#8b4513',salmon:'#fa8072',sandybrown:'#f4a460',seagreen:'#2e8b57',seashell:'#fff5ee',sienna:'#a0522d',silver:'#c0c0c0',skyblue:'#87ceeb',slateblue:'#6a5acd',slategray:'#708090',snow:'#fffafa',springgreen:'#00ff7f',steelblue:'#4682b4',tan:'#d2b48c',teal:'#008080',thistle:'#d8bfd8',tomato:'#ff6347',turquoise:'#40e0d0',violet:'#ee82ee',wheat:'#f5deb3',white:'#ffffff',whitesmoke:'#f5f5f5',yellow:'#ffff00',yellowgreen:'#9acd32'};
 
 function colorDistance(r1,g1,b1,r2,g2,b2){return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2)}
@@ -1727,8 +2089,8 @@ function setRandTab(tab, el) {
   document.querySelectorAll('.mini-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   ['password','uuid','number','bytes'].forEach(t => {
-    const el = document.getElementById(`rand-${t}-opts`);
-    if(el) el.style.display = t === tab ? '' : 'none';
+    const el2 = document.getElementById(`rand-${t}-opts`);
+    if(el2) el2.style.display = t === tab ? '' : 'none';
   });
 }
 
@@ -1820,7 +2182,9 @@ function transform(type) {
 let jsonTab = 'format';
 function setJsonTab(tab, el) {
   jsonTab = tab;
-  document.querySelectorAll('.card:has(#json-in) .mini-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#json-in').forEach(el2 => {
+    el2.closest('.card').querySelectorAll('.mini-tab').forEach(t => t.classList.remove('active'));
+  });
   el.classList.add('active');
 }
 function doJSON() {
@@ -1840,7 +2204,6 @@ function doRegex() {
   const out = document.getElementById('regex-out');
   if(!pattern || !text) { out.innerHTML = ''; return; }
   try {
-    const re = new RegExp(pattern, flags);
     const matches = [...text.matchAll(new RegExp(pattern, flags.includes('g')?flags:flags+'g'))];
     const highlighted = text.replace(new RegExp(pattern, flags.includes('g')?flags:flags+'g'),
       m => `<mark style="background:rgba(0,229,255,0.25);color:var(--text);border-radius:3px;padding:0 2px">${m}</mark>`);
@@ -1850,15 +2213,112 @@ function doRegex() {
   } catch(e) { out.innerHTML = `<span style="color:var(--danger)">Invalid regex: ${e.message}</span>`; }
 }
 
+// =================== LOREM IPSUM (NEW) ===================
+const LOREM_WORDS = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum viverra nam libero justo laoreet sit pulvinar pellentesque habitant morbi tristique senectus et netus malesuada fames ac turpis egestas'.split(' ');
+function genLorem() {
+  const count = parseInt(document.getElementById('lorem-count').value) || 1;
+  const type = document.getElementById('lorem-type').value;
+  let result = '';
+  if(type === 'words') {
+    const arr = [];
+    for(let i = 0; i < count; i++) arr.push(LOREM_WORDS[Math.floor(Math.random()*LOREM_WORDS.length)]);
+    result = arr.join(' ');
+  } else if(type === 'sentences') {
+    for(let i = 0; i < count; i++) {
+      const len = 8 + Math.floor(Math.random()*10);
+      const words = [];
+      for(let j = 0; j < len; j++) words.push(LOREM_WORDS[Math.floor(Math.random()*LOREM_WORDS.length)]);
+      words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+      result += words.join(' ') + '. ';
+    }
+  } else {
+    for(let i = 0; i < count; i++) {
+      const sents = 3 + Math.floor(Math.random()*4);
+      let para = '';
+      for(let s = 0; s < sents; s++) {
+        const len = 8 + Math.floor(Math.random()*12);
+        const words = [];
+        for(let j = 0; j < len; j++) words.push(LOREM_WORDS[Math.floor(Math.random()*LOREM_WORDS.length)]);
+        words[0] = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+        para += words.join(' ') + '. ';
+      }
+      result += para.trim() + '\n\n';
+    }
+  }
+  setOut('lorem-out', result.trim());
+}
+
+// =================== DIFF CHECKER (NEW) ===================
+function doDiff() {
+  const a = document.getElementById('diff-a').value.split('\n');
+  const b = document.getElementById('diff-b').value.split('\n');
+  const out = document.getElementById('diff-out');
+  let html = '';
+  const maxLen = Math.max(a.length, b.length);
+  let added = 0, removed = 0, unchanged = 0;
+  for(let i = 0; i < maxLen; i++) {
+    const la = a[i], lb = b[i];
+    if(la === undefined) {
+      html += `<span style="color:var(--success);background:rgba(16,185,129,0.1);display:block;padding:0 4px">+ ${lb}</span>`;
+      added++;
+    } else if(lb === undefined) {
+      html += `<span style="color:var(--danger);background:rgba(239,68,68,0.1);display:block;padding:0 4px">- ${la}</span>`;
+      removed++;
+    } else if(la === lb) {
+      html += `<span style="color:var(--muted);display:block;padding:0 4px">  ${la}</span>`;
+      unchanged++;
+    } else {
+      html += `<span style="color:var(--danger);background:rgba(239,68,68,0.1);display:block;padding:0 4px">- ${la}</span>`;
+      html += `<span style="color:var(--success);background:rgba(16,185,129,0.1);display:block;padding:0 4px">+ ${lb}</span>`;
+      added++; removed++;
+    }
+  }
+  out.innerHTML = `<div style="margin-bottom:0.5rem;font-size:0.75rem;color:var(--muted)"><span style="color:var(--success)">+${added} added</span>  <span style="color:var(--danger)">-${removed} removed</span>  <span>${unchanged} unchanged</span></div>` + html;
+}
+
+// =================== CRON PARSER (NEW) ===================
+function parseCron() {
+  const expr = document.getElementById('cron-in').value.trim();
+  const out = document.getElementById('cron-out');
+  const parts = expr.split(/\s+/);
+  if(parts.length !== 5) { out.innerHTML = `<span style="color:var(--danger)">Invalid: needs exactly 5 fields (minute hour day month weekday)</span>`; return; }
+  const [min, hour, day, month, weekday] = parts;
+  function desc(val, unit, names) {
+    if(val === '*') return `every ${unit}`;
+    if(val.includes('/')) { const [,step] = val.split('/'); return `every ${step} ${unit}s`; }
+    if(val.includes('-')) { const [a,b] = val.split('-'); return `${unit}s ${a} through ${b}${names?' ('+names[parseInt(a)-1]+' to '+names[parseInt(b)-1]+')':''}`; }
+    if(val.includes(',')) return `${unit}s ${val.split(',').map(v => names?names[parseInt(v)-(unit==='month'?1:0)]||v:v).join(', ')}`;
+    const n = parseInt(val);
+    if(names) return names[unit==='month'?n-1:n] || val;
+    return `${unit} ${val}`;
+  }
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const lines = [
+    ['Minute', desc(min,'minute',null)],
+    ['Hour', desc(hour,'hour',null)],
+    ['Day of month', desc(day,'day',null)],
+    ['Month', desc(month,'month',months)],
+    ['Day of week', desc(weekday,'weekday',days)],
+  ];
+  // next 5 rough descriptions
+  out.innerHTML = lines.map(([k,v]) =>
+    `<div><span style="color:var(--accent2); min-width:120px; display:inline-block">${k}:</span> ${v}</div>`
+  ).join('') +
+  `<div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border); color:var(--accent3)">Human readable: Runs at ${desc(min,'minute',null)}, ${desc(hour,'hour',null)}, ${desc(day,'day',null)} of month, ${desc(month,'month',months)}, ${desc(weekday,'weekday',days)}</div>`;
+}
+
 // =================== INIT ===================
-// Initialize unit converter
 setUnitCat('length', document.querySelector('#panel-convert .cat-pill'));
 updateColorConversions('#00e5ff');
 genPalette();
 checkContrast();
 findColorName('#ff6b6b');
 tsNow();
-
+doBitwise();
+genGradient();
+updateMixer();
+parseCron();
 </script>
 </body>
 </html>
